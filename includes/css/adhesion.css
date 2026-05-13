@@ -1,0 +1,268 @@
+
+        :root {
+          --primary-color: #4A148C;  /* Violet profond */
+          --secondary-color: #FF6F00; /* Orange vif */
+          --accent-color: #00B4D8;   /* Bleu cyan */
+          --text-color: #333333;
+          --light-bg: rgba(255, 255, 255, 0.95);
+        }
+        
+        body, html {
+          height: 100%;
+          margin: 0;
+          font-family: 'Montserrat', sans-serif;
+          background: 
+            radial-gradient(circle at 20% 30%, var(--primary-color) 0%, transparent 20%),
+            radial-gradient(circle at 80% 70%, var(--secondary-color) 0%, transparent 20%),
+            radial-gradient(circle at 50% 20%, var(--accent-color) 0%, transparent 20%),
+            linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          background-size: 200% 200%;
+          animation: gradientAnimation 15s ease infinite;
+          color: var(--text-color);
+        }
+
+        @keyframes gradientAnimation {
+          0% {background-position: 0% 0%;}
+          50% {background-position: 100% 100%;}
+          100% {background-position: 0% 0%;}
+        }
+
+        .logo-style {
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 700;
+          color: white;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+          letter-spacing: 1px;
+        }
+
+        .adhesion-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1.5rem;
+        }
+
+        .card {
+          border-radius: 1rem;
+          background: var(--light-bg);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+          transition: transform 0.3s, box-shadow 0.3s;
+          border: none;
+          overflow: hidden;
+        }
+        
+        .card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 5px;
+          background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+          background-size: 200% 100%;
+          animation: gradientBG 3s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+          0% {background-position: 0% 50%;}
+          50% {background-position: 100% 50%;}
+          100% {background-position: 0% 50%;}
+        }
+
+        .card:hover {
+          transform: translateY(-5px) scale(1.01);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+        }
+
+        .form-label {
+          font-weight: 600;
+          color: var(--primary-color);
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 111, 0, 0.25);
+        }
+
+        .form-control {
+          padding: 0.85rem 1rem;
+          border-radius: 0.5rem;
+          border: 1px solid #ddd;
+          transition: all 0.3s;
+        }
+        
+        .form-control:hover {
+          border-color: var(--accent-color);
+        }
+
+        .btn-primary {
+          background-color: var(--secondary-color);
+          border: none;
+          padding: 0.75rem;
+          font-weight: 600;
+          transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+          background-color: var(--primary-color);
+          transform: translateY(-2px);
+        }
+
+        .info-section {
+          padding: 1.5rem;
+          background: white;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          text-align: center;
+          height: 100%;
+          transition: all 0.3s;
+          border-top: 3px solid var(--accent-color);
+        }
+        
+        .info-section:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+        
+        .info-section i {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+          color: var(--primary-color);
+          transition: all 0.3s;
+        }
+        
+        .info-section:hover i {
+          color: var(--secondary-color);
+          transform: scale(1.1);
+        }
+        
+        .info-section h5 {
+          font-size: 1.1rem;
+          margin-bottom: 0.75rem;
+          color: var(--primary-color);
+          font-weight: 600;
+        }
+        
+        .info-section p {
+          font-size: 0.9rem;
+          margin-bottom: 0;
+          color: var(--text-color);
+        }
+        
+        .section-title {
+          position: relative;
+          margin-bottom: 2rem;
+          color: var(--primary-color);
+        }
+        
+        .section-title::after {
+          content: '';
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 80px;
+          height: 3px;
+          background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
+          border-radius: 3px;
+        }
+        
+        /* Animation des éléments de fond */
+        .bg-animation {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: -1;
+          overflow: hidden;
+        }
+        
+        .bg-circle {
+          position: absolute;
+          border-radius: 50%;
+          background: rgba(74, 20, 140, 0.1);
+          animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+          0% { transform: translateY(0) rotate(0deg); }
+          100% { transform: translateY(-1000px) rotate(720deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .card {
+            margin-top: 1rem;
+          }
+          
+          .info-section {
+            margin-bottom: 1rem;
+          }
+        }
+        .small-card {
+        padding: 1rem !important;
+      }
+
+      .small-card i {
+        font-size: 1.8rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+
+      .small-card h5 {
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+      }
+
+      .small-card p {
+        font-size: 0.8rem !important;
+      }
+/* Labels en majuscules + italique */
+.custom-label {
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+/* Textes dans les champs : majuscules, italique, gras */
+.custom-input {
+  font-style: italic;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Ajustement des icônes à l’intérieur des champs */
+.input-group-text {
+  background-color: #f8f9fa;
+  border-right: none;
+}
+
+.input-group .form-control {
+  border-left: none;
+}
+
+/* Pour s'assurer que l'input reste bien aligné */
+.input-group .form-control:focus {
+  z-index: 2;
+}
+
+/* Pour les radios */
+.form-check-label {
+  font-style: italic;
+  text-transform: uppercase;
+}
+.form-label {
+    text-transform: uppercase;
+    font-style: italic;
+  }
+
+  .form-control::placeholder,
+  .form-control {
+    text-transform: uppercase;
+    font-style: italic;
+    font-weight: bold;
+  }
+
+  .input-group-text i {
+    font-style: normal;
+  }

@@ -1,0 +1,435 @@
+================================================================================
+  DOCUMENTATION DU PROJET ANVDKO (texte brut)
+================================================================================
+
+Ce document decrit l'organisation du depot, les zones applicatives (site
+public, espace administration, espace membre), les principales bases de
+donnees et tables observees dans le code, ainsi qu'un plan fonctionnel
+general. Issu de l'analyse du code source au moment de sa redaction.
+
+Encodage recommande : UTF-8
+
+
+--------------------------------------------------------------------------------
+1. VUE D'ENSEMBLE
+--------------------------------------------------------------------------------
+
+ANVDKO est une application web PHP orientee association, deployee typiquement
+sous WAMP (Windows, Apache, MySQL, PHP). Elle couvre :
+
+  - une vitrine et des formulaires publics (adhesion, contact) ;
+  - un back-office (dossier anvdko/) pour les comptes "administration"
+    (table utilisateurs) ;
+  - un espace membre (dossier membres/) pour les personnes enregistrees dans
+    la table membres.
+
+Le theme administration repose sur des assets type Phoenix (Bootstrap, Feather
+icons, etc.). L'espace membre et le site public utilisent Bootstrap et des
+gabarits HTML dedies.
+
+
+--------------------------------------------------------------------------------
+2. ARBORESCENCE LOGIQUE
+--------------------------------------------------------------------------------
+
+Zone              Dossier / fichiers                         Role
+----------------  ---------------------------------------  ------------------
+Site public       index.php, adhesion.php, projets.php,    Presentation,
+                  forms/, assets/, includes/               navigation, formulaires
+
+Administration    anvdko/                                  Connexion admin,
+                                                           tableau de bord,
+                                                           contenus,
+                                                           comptabilite,
+                                                           membres, config
+
+Espace membre     membres/                                 Connexion membre,
+                                                           profil, cotisations,
+                                                           evenements, documents
+
+Partage           include/php/ (BDD, fonctions),          Utilitaires,
+                  fichiers/ (uploads, logos)               medias communs
+
+Fichiers de connexion notables :
+
+  - include/php/connexion_bdd.php
+    Connexion MySQLi vers la base "anvdko_oussoukro" (majorite des pages).
+
+  - includes/php/bdd.php
+    Variante avec la base "anvdko" et objet mysqli (usage selon modules).
+
+
+--------------------------------------------------------------------------------
+3. TECHNOLOGIES ET PREREQUIS
+--------------------------------------------------------------------------------
+
+  - Langage : PHP (sessions, MySQLi, requetes preparees possibles cote documents)
+  - Base de donnees : MySQL / MariaDB
+  - Front : HTML, CSS (Bootstrap 5), JavaScript (Ajax, APIs depenses)
+  - Serveur : Apache (ex. WAMP)
+
+Fuseau horaire : Africa/Abidjan (defini dans connexion_bdd.php).
+
+
+--------------------------------------------------------------------------------
+4. MODELE DE DONNEES (TABLES REPEREES DANS LE CODE)
+--------------------------------------------------------------------------------
+
+Le schema SQL complet n'est pas versionne dans le depot (sauf script partiel
+pour les depenses). Liste des noms de tables reellement utilises dans les
+requetes PHP.
+
+4.1 Association et utilisateurs
+--------------------------------
+  configurations     Identite de l'association (nom/sigle, contacts, logo).
+                     Liee au contexte session "configuration".
+
+  utilisateurs       Comptes administration (pseudo, telephone, email, mot de
+                     passe, statut, role secretaire, id_configuration).
+
+  membres            Adherents (identite, genre, cotisation, membre_bureau,
+                     qr_url, num_adhesion, dates, statut, etc.).
+
+4.2 Cotisations et paiements
+-----------------------------
+  paiements                        Paiements mensuels par membre et par mois
+                                   (mois_payer, montants, statuts Paye, Moitie paye).
+
+  config_cotisations_exceptionnelles   Motifs d'exception (montants standard,
+                                       par genre, bureau, periodes).
+
+  exceptionnels_pay                Suivi des paiements exceptionnels par membre
+                                   et par motif.
+
+4.3 Contenus editoriaux
+------------------------
+  cat_actualites     Categories actualites (reutilisees aussi pour agenda /
+                     ADCI TV dans certains ecrans).
+
+  actualites         Articles d'actualites.
+
+  agenda             Entrees d'agenda.
+
+  event_cat          Categories d'evenements.
+
+  evenements         Evenements (dates, contenu, lien categorie).
+
+  adci_tv            Contenus media / chaine ANVDKO TV ou ADCI TV.
+
+4.4 Dons et documents
+----------------------
+  faire_don          Enregistrement des dons (coordonnees, montant, moyen).
+
+  documents          Mediatheque membres (metadonnees fichier, categorie,
+                     visibilite, taille, statut).
+
+4.5 Depenses (module dedie)
+----------------------------
+Script SQL : anvdko/sql/create_expense_tables.sql
+
+  depenses_anvdko       Depense (titre, categorie, description, dates, id_user).
+
+  depense_montants      Un ou plusieurs paiements partiels par depense.
+
+  depense_commentaires  Fil de commentaires sur une depense.
+
+4.6 Inscriptions aux evenements (membres)
+-----------------------------------------
+  inscription_evenement   Inscription d'un membre a un evenement (nombre de
+                          personnes, commentaire, newsletter).
+
+4.7 Module commandes / stock (legacy ou multi-usage)
+-----------------------------------------------------
+Present dans anvdko/includes/php/ajax/details_commande.php et recus :
+
+  commandes, produits_commande, produits, clients, livreurs, fermes,
+  factures, journal_caisse, cat_produits, select_cats_produit, cat_nestable
+
+Sous-systeme de gestion de commandes possiblement reutilise ou en parallele
+avec la gestion associative.
+
+4.8 Point d'attention
+---------------------
+Le fichier anvdko/ajax/get_expense_details.php reference une table "users"
+dans un JOIN, alors que le projet utilise surtout "utilisateurs". A verifier
+en base (vue, homonyme, ou correction).
+
+
+--------------------------------------------------------------------------------
+5. ESPACE ADMINISTRATION (anvdko/)
+--------------------------------------------------------------------------------
+
+Authentification :
+  - anvdko/index.php (formulaire)
+  - anvdko/ajax.php (Ajax : session utilisateur + configuration)
+
+Controle d'acces :
+  - anvdko/includes/php/connexion_acces_page.php
+    Verifie que statut utilisateur = actif.
+
+5.1 Menu et profils (includes/php/menu.php)
+---------------------------------------------
+  - secretaire === "Oui"  : menu reduit (Gestion membres adherents.php,
+                            Gestion dons gestions_dons.php).
+
+  - secretaire === "Non"  : menu contenu (categories, actualites, agenda,
+                            evenements, ADCI TV, configuration, utilisateurs)
+                            sans le bloc comptabilite etendu de la branche suivante.
+
+  - Sinon : menu large avec Comptabilite (paiements mensuels, recaps,
+            exceptionnels), Depenses Anvdko, agenda, evenements, TV, membres,
+            cartes membres, configuration, utilisateurs.
+
+5.2 Pages principales et role concret
+--------------------------------------
+  accueil.php                    Tableau de bord, agregations sur paiements
+                                 (mois courant, 3/6 mois, annee).
+
+  configuration.php            Mise a jour configurations (contacts, logo).
+
+  utilisateurs.php             CRUD utilisateurs (indicateur secretaire).
+
+  adherents.php                Liste / acces gestion membres.
+
+  adherent_details.php         Creation / modification membres (membre du
+                                 bureau). Voir README_MEMBRE_BUREAU.md.
+
+  actualites_cats.php          CRUD cat_actualites.
+
+  actualites.php               Liste actualites.
+  actualite_details.php        Edition actualites.
+
+  agenda.php + agenda_details.php   Liste et edition agenda.
+
+  event_cats.php               CRUD event_cat.
+
+  evenements.php + evenements_detail.php   Liste, suppression, detail evenements.
+
+  adci_tv.php + adci_tv_details.php      Gestion contenus adci_tv.
+
+  gestions_dons.php            Saisie et liste dons (faire_don).
+
+  pay_mensuels.php             Interface paiements cotisations mensuelles.
+
+  pay_mensuels_recap.php       Recap paiements mensuels.
+  recap_pay_mensuel.php        Idem recap mensuel.
+
+  exceptionnels_pay.php        Paiements cotisations exceptionnelles.
+
+  create_exceptionnel.php      Creation config cotisation exceptionnelle.
+
+  exceptionnels_pay_recap.php  Recap exceptionnels.
+
+  plusieursPaiements.php       Paiement groupe plusieurs membres.
+
+  paiements_membre.php         Detail paiements pour un membre (admin).
+
+  paiement_ajax.php
+  paiementsGroupe_ajax.php
+  process_multiple_payments.php
+  get_montant.php
+  get_membre_info.php
+  get_multiple_membres_info.php    Ajax encaissements et infos membres.
+
+  stock.php, stocks.php        Vues synthese / stock (selon contexte metier).
+
+  cartesAdherents.php
+  voir_cartes.php
+  generer_cartes_pdf.php
+  badge.php
+  badge_template.php           Cartes et badges adherents (QR).
+
+  depenses_anvdko.php
+  depense_detail.php           Liste et fiche depenses.
+
+  ajax/depenses_api.php
+  ajax/commentaires_api.php
+  ajax/get_expense_details.php     API JSON depenses / commentaires.
+
+  ajax_autre.php               Recherches et mises a jour transverses.
+
+  mon_compte.php
+  deconnexion.php              Compte admin et sortie session.
+
+  upload.php                   Televersement fichiers.
+
+  produits.php                 Produits et categories (module commandes).
+
+  includes/php/ajax/details_commande.php   Detail commande.
+  includes/php/recus/recu1.php, recu2.php  Recus / facturation.
+
+
+--------------------------------------------------------------------------------
+6. ESPACE MEMBRE (membres/)
+--------------------------------------------------------------------------------
+
+Authentification :
+  - membres/index.php (interface)
+  - membres/connexion.php (Ajax : membres actifs par telephone + mot de passe)
+
+Controle d'acces :
+  - membres/includes/php/connexion_acces_page.php
+    Redirige si statut membre != actif.
+
+6.1 Pages et role concret
+--------------------------
+  accueil.php                  Accueil, modification profil (UPDATE membres).
+
+  profil.php                   Profil membre.
+
+  voir_cotisation.php          Etat paiements mensuels du membre connecte.
+
+  recap_pay_mensuels.php
+  recap_pay_exeptionnels.php   Recaps cote adherent.
+
+  evenements.php               Liste / interaction evenements.
+
+  historique-evenements.php    Evenements passes (date_debut < NOW()),
+                               recherche cote client.
+
+  traitement_inscription.php   API JSON : inscription_evenement (CRUD).
+
+  membres.php                  Annuaire / liste membres.
+
+  documents.php
+  upload_document.php          Bibliotheque documents.
+
+  stock.php                    Vue ressources / stock membre.
+
+  badge.php, voir_badge.php, badge1.php   Badge / QR membre.
+
+  password_forget.php          Aide mot de passe.
+
+  deconnexion.php              Fin session.
+
+  ajax.php                     Actions Ajax diverses.
+
+
+--------------------------------------------------------------------------------
+7. SITE PUBLIC (racine et forms/)
+--------------------------------------------------------------------------------
+
+  index.php              Page d'accueil ANVDKO.
+
+  adhesion.php           Formulaire d'adhesion en ligne.
+
+  projets.php            Page projets.
+
+  forms/contact.php      Formulaire contact.
+  forms/test_local.php   Test local eventuel.
+
+  ajax.php (racine)      Ajax site public si utilise.
+
+Assets : assets/, includes/php/header.php, footer.php, etc.
+
+
+--------------------------------------------------------------------------------
+8. FICHIERS INCLUS ET UTILITAIRES
+--------------------------------------------------------------------------------
+
+  include/php/fonctions.php              Fonctions transverses (IDs chiffres,
+                                         URLs fichiers, reload page).
+
+  anvdko/includes/php/header.php, footer.php,
+  includes-css.php, includes-js.php      Gabarit admin.
+
+  membres/includes/php/header.php, footer.php,
+  include-css.php, include-js.php        Gabarit membre.
+
+
+--------------------------------------------------------------------------------
+9. FLUX FONCTIONNELS (RESUME ASCII)
+--------------------------------------------------------------------------------
+
+  [Public: index, adhesion, contact]
+            |
+            v
+       [ MySQL : anvdko_oussoukro ]
+            ^
+            |
+  [Admin anvdko: connexion, contenus, comptabilite, depenses]
+            |
+            v
+       [ Membres: connexion, profil, cotisations, evenements, documents ]
+
+
+Etapes metier :
+
+  1. Adhesion / membre : adhesion.php ; donnees vers membres selon branchement.
+     Connexion via membres/.
+
+  2. Administration : utilisateurs via anvdko/ ; contenus, membres, dons,
+     cotisations, commandes/stock eventuel.
+
+  3. Cotisations : paiements mensuels dans paiements ; exceptionnels via
+     config_cotisations_exceptionnelles + exceptionnels_pay.
+
+  4. Communication : actualites, agenda, evenements, TV dans les tables
+     homonymes.
+
+  5. Depenses : module Ajax + tables depenses_*.
+
+
+--------------------------------------------------------------------------------
+10. SECURITE ET BONNES PRATIQUES (CONSTAT CODE)
+--------------------------------------------------------------------------------
+
+  - Beaucoup de requetes par concatenation de chaines : risque injection SQL ;
+    privilegier les requetes preparees (deja amorce sur upload_document.php).
+
+  - Mots de passe en clair en base sur les logins observes : prevoir
+    password_hash / password_verify.
+
+  - Coherence bases anvdko vs anvdko_oussoukro ; table users vs utilisateurs.
+
+
+--------------------------------------------------------------------------------
+11. DOCUMENTATION INTERNE EXISTANTE
+--------------------------------------------------------------------------------
+
+  anvdko/README_MEMBRE_BUREAU.md
+    Cotisations exceptionnelles (membre du bureau, genre), scripts SQL
+    suggeres (add_membre_bureau_column.sql, add_montant_femme_column.sql).
+
+  anvdko/sql/create_expense_tables.sql
+    Creation tables module depenses.
+
+
+--------------------------------------------------------------------------------
+12. PLAN GENERAL DU PROJET (VISION PRODUIT)
+--------------------------------------------------------------------------------
+
+  Identite & parametres
+    Configuration association, utilisateurs back-office, droits secretaire
+    vs complet.
+
+  Adherents
+    Membres, cartes, badges QR, annuaire, profil en ligne.
+
+  Finances internes
+    Cotisations mensuelles et exceptionnelles, recaps, dons, module depenses.
+
+  Vie associative
+    Actualites, agenda, evenements, inscriptions, historique.
+
+  Medias
+    Contenus ADCI TV / ANVDKO TV.
+
+  Documents
+    Depot et classement fichiers pour membres.
+
+  Extensions
+    Module commandes / produits / factures (a valider selon perimetre reel).
+
+
+--------------------------------------------------------------------------------
+13. MAINTENANCE DE CE DOCUMENT
+--------------------------------------------------------------------------------
+
+Photographie du code au moment de la redaction. Apres evolution majeure
+(nouvelles tables, pages, changement de base), mettre a jour les sections
+4, 5, 6 et 12.
+
+================================================================================
+  Fin du document DOCUMENTATION_PROJET.txt
+================================================================================
