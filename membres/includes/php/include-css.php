@@ -40,7 +40,8 @@
     userLinkRTL.setAttribute('disabled', true);
   }
 </script>
-<link href="../anvdko/vendors/leaflet/leaflet.css" rel="stylesheet">
+<link href="../anvdko/assets/css/anvdko-brand.css" rel="stylesheet">
+<link href="../assets/css/anvdko-loader.css" rel="stylesheet">
 <link href="../anvdko/vendors/leaflet.markercluster/MarkerCluster.css" rel="stylesheet">
 <link href="../anvdko/vendors/leaflet.markercluster/MarkerCluster.Default.css" rel="stylesheet">
 

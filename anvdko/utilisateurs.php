@@ -10,9 +10,15 @@ include("../include/php/fonctions.php");
        $telephone = strip_tags(htmlspecialchars(trim($_POST["telephone"])));
        $email = strip_tags(htmlspecialchars(trim($_POST["email"])));
        $secretaire = strip_tags(htmlspecialchars(trim($_POST["secretaire"])));
+       $password = (string) ($_POST['password'] ?? '');
+       $password2 = (string) ($_POST['password_confirm'] ?? '');
+       if (strlen($password) < 6 || $password !== $password2) {
+           die("Mot de passe invalide : minimum 6 caractères et confirmation identique.");
+       }
+       $hash = mysqli_real_escape_string($bdd, anvdko_password_hash($password));
 
-       $query = "INSERT INTO utilisateurs(pseudo , telephone, email, secretaire, id_configuration, date_heure) 
-                 VALUES (\"$pseudo\", \"$telephone\", \"$email\",  \"$secretaire\", ".$_SESSION['configuration']['id'].", '".date('Y-m-d H:i:s')."')";
+       $query = "INSERT INTO utilisateurs(pseudo , telephone, email, password, secretaire, id_configuration, date_heure) 
+                 VALUES (\"$pseudo\", \"$telephone\", \"$email\", \"$hash\",  \"$secretaire\", ".$_SESSION['configuration']['id'].", '".date('Y-m-d H:i:s')."')";
        mysqli_query($bdd, $query) or die("Requête non conforme0101"); 
        reload_current_page();
    }
@@ -24,14 +30,22 @@ include("../include/php/fonctions.php");
         $telephone = strip_tags(htmlspecialchars(trim($_POST["telephone"])));
         $email = strip_tags(htmlspecialchars(trim($_POST["email"])));
         $secretaire = strip_tags(htmlspecialchars(trim($_POST["secretaire"])));
+        $password = (string) ($_POST['password'] ?? '');
+        $password2 = (string) ($_POST['password_confirm'] ?? '');
 
+        $sqlPwd = '';
+        if ($password !== '' && $password === $password2 && strlen($password) >= 6) {
+            $hash = mysqli_real_escape_string($bdd, anvdko_password_hash($password));
+            $sqlPwd = ", password = \"$hash\" ";
+        }
 
         $query = "UPDATE utilisateurs  
                   SET pseudo = \"$pseudo\", 
                       telephone = \"$telephone\",
                       email = \"$email\",
-                      secretaire = \"$secretaire\",
-                      date_heure  = '".date('Y-m-d H:i:s')."'
+                      secretaire = \"$secretaire\"
+                      $sqlPwd
+                      , date_heure  = '".date('Y-m-d H:i:s')."'
                   WHERE id =".$id_utilisateur;
         if(@mysqli_query($bdd, $query)){reload_current_page();}else{die("Requête non conforme");}
         header('location: utilisateurs.php');
@@ -165,6 +179,14 @@ include("../include/php/fonctions.php");
                             <label class="form-label">E-mail</label>
                             <input type="email" name="email" class="form-control" required/>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mot de passe (min. 6 caractères)</label>
+                            <input type="password" name="password" class="form-control" minlength="6" autocomplete="new-password" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirmer le mot de passe</label>
+                            <input type="password" name="password_confirm" class="form-control" minlength="6" autocomplete="new-password" required/>
+                        </div>
                         
                         <div class="col-12 mb-3 text-center">
                             <label class="form-label fw-bold mb-2 d-block"><i class="fa fa-briefcase"></i> Sécrétaire</label>
@@ -212,6 +234,14 @@ include("../include/php/fonctions.php");
                         <div class="mb-3">
                             <label class="form-label">E-mail</label>
                             <input type="email" name="email" class="form-control" required/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nouveau mot de passe (optionnel)</label>
+                            <input type="password" name="password" class="form-control" minlength="6" autocomplete="new-password"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirmer le mot de passe</label>
+                            <input type="password" name="password_confirm" class="form-control" minlength="6" autocomplete="new-password"/>
                         </div>
                         
                         <div class="col-12 mb-3 text-center">

@@ -119,7 +119,7 @@ $_SESSION['paiment'] = mysqli_fetch_array($resultat);
                     <div class="col-md-4">
                         <a href="recap_pay_mensuels.php?id_membre=<?= htmlspecialchars(crypt_decrypt_chaine($_SESSION["membre_id"], 'C')) ?>" class="d-block text-decoration-none text-reset p-3 m-2 border-start border-5 rounded <?= $card_class ?>">
                             <h4 class="mb-3">
-                                <?= safe_safe_ucfirst(utf8_encode(strftime('%B %Y', strtotime($paiement["mois_payer"])))) ?>
+                                <?= safe_safe_ucfirst(mois_annee_fr($paiement["mois_payer"])) ?>
                             </h4>
                             <div class="my-1"><strong>À Payer</strong> <span class="float-end"><?= $a_payer ?> FCFA</span></div>
                             <div class="my-1"><strong>Payé</strong> <span class="float-end"><?= $paye ?> FCFA</span></div>
@@ -185,7 +185,7 @@ $_SESSION['paiment'] = mysqli_fetch_array($resultat);
                     // 5. Affichage
                     if (count($mois_non_payes) > 0) {
                         foreach ($mois_non_payes as $p) {
-                            $mois_affiche = safe_safe_ucfirst(utf8_encode(strftime('%B %Y', strtotime($p["mois"] ?? $p["mois_payer"]))));
+                            $mois_affiche = safe_safe_ucfirst(mois_annee_fr($p["mois"] ?? $p["mois_payer"]));
 
                             $a_payer = $p["a_payer"];
                             $paye = $p["paye"];
@@ -241,7 +241,9 @@ $_SESSION['paiment'] = mysqli_fetch_array($resultat);
 
                         while ($mois_debut <= $mois_fin) {
                             $mois_format_sql = $mois_debut->format('Y-m');
-                            $mois_formate = safe_safe_ucfirst(utf8_encode(strftime('%B %Y', $mois_debut->getTimestamp())));
+                            $mois_n = (int) $mois_debut->format('n');
+                            $mois_fr = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                            $mois_formate = safe_safe_ucfirst(($mois_fr[$mois_n] ?? $mois_debut->format('m')) . ' ' . $mois_debut->format('Y'));
 
                             if (isset($paiements_map[$mois_format_sql])) {
                                 $paiement = $paiements_map[$mois_format_sql];

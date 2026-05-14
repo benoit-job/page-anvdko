@@ -1,5 +1,13 @@
 
   	  
+<!-- ANVDKO Page Loader -->
+<div class="anvdko-page-loader" id="anvdkoLoader">
+  <img src="../../assets/img/LOGO.jpg" alt="ANVDKO" class="loader-logo">
+  <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+  <div class="loader-text">Chargement…</div>
+</div>
+<script>window.addEventListener('load',function(){var l=document.getElementById('anvdkoLoader');if(l)l.classList.add('loaded');});</script>
+
 <nav class='mb-1' style='height: 60px; padding: 5px; background-color: white; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 100%; z-index: 1000;'>
 
 <!-- Premier bloc -->

@@ -17,8 +17,8 @@ $mois3 = date('Y-m', strtotime('-2 months'));
 
 // 1. Ce Mois
 $sqlCeMois = "SELECT 
-              SUM(CASE WHEN statut = 'payé' THEN paye ELSE 0 END) as total_paye,
-              SUM(CASE WHEN statut = 'Moitié payé' THEN paye ELSE 0 END) as total_partiel
+              SUM(CASE WHEN LOWER(TRIM(statut)) IN ('payé','paye') THEN paye ELSE 0 END) as total_paye,
+              SUM(CASE WHEN LOWER(TRIM(statut)) IN ('moitié payé','moitie paye','moitié paye') THEN paye ELSE 0 END) as total_partiel
               FROM paiements 
               WHERE mois_payer = '$mois1' AND mois_payer != 'total :'";
 $resultCeMois = $bdd->query($sqlCeMois);
@@ -29,8 +29,8 @@ $totalCeMois = $totalPayeCeMois + $totalPartielCeMois;
 
 // 2. Trois derniers mois
 $sqlTroisMois = "SELECT 
-                SUM(CASE WHEN statut = 'payé' THEN paye ELSE 0 END) as total_paye,
-                SUM(CASE WHEN statut = 'Moitié payé' THEN paye ELSE 0 END) as total_partiel
+                SUM(CASE WHEN LOWER(TRIM(statut)) IN ('payé','paye') THEN paye ELSE 0 END) as total_paye,
+                SUM(CASE WHEN LOWER(TRIM(statut)) IN ('moitié payé','moitie paye','moitié paye') THEN paye ELSE 0 END) as total_partiel
                 FROM paiements 
                 WHERE mois_payer IN ('$mois1', '$mois2', '$mois3') AND mois_payer != 'total :'";
 $resultTroisMois = $bdd->query($sqlTroisMois);
@@ -47,8 +47,8 @@ for ($i = 0; $i < 6; $i++) {
 $moisListStr = "'" . implode("','", $moisListSix) . "'";
 
 $sqlSixMois = "SELECT 
-                SUM(CASE WHEN statut = 'payé' THEN paye ELSE 0 END) as total_paye,
-                SUM(CASE WHEN statut = 'Moitié payé' THEN paye ELSE 0 END) as total_partiel
+                SUM(CASE WHEN LOWER(TRIM(statut)) IN ('payé','paye') THEN paye ELSE 0 END) as total_paye,
+                SUM(CASE WHEN LOWER(TRIM(statut)) IN ('moitié payé','moitie paye','moitié paye') THEN paye ELSE 0 END) as total_partiel
                 FROM paiements 
                 WHERE mois_payer IN ($moisListStr) AND mois_payer != 'total :'";
 $resultSixMois = $bdd->query($sqlSixMois);
@@ -60,8 +60,8 @@ $totalSixMois = $totalPayeSixMois + $totalPartielSixMois;
 // 4. Cette année
 $currentYear = date('Y');
 $sqlAnnee = "SELECT 
-              SUM(CASE WHEN statut = 'payé' THEN paye ELSE 0 END) as total_paye,
-              SUM(CASE WHEN statut = 'Moitié payé' THEN paye ELSE 0 END) as total_partiel
+              SUM(CASE WHEN LOWER(TRIM(statut)) IN ('payé','paye') THEN paye ELSE 0 END) as total_paye,
+              SUM(CASE WHEN LOWER(TRIM(statut)) IN ('moitié payé','moitie paye','moitié paye') THEN paye ELSE 0 END) as total_partiel
               FROM paiements 
               WHERE mois_payer LIKE '$currentYear-%' AND mois_payer != 'total :'";
 $resultAnnee = $bdd->query($sqlAnnee);
@@ -189,7 +189,7 @@ $totalAnnee = $totalPayeAnnee + $totalPartielAnnee;
                 <p class="fs-9 mb-0">Actualités publiées</p>
               </div>
               
-              <!-- Vidéos ADCI TV -->
+              <!-- Vidéos ANVDKO TV -->
               <div class="col-6 col-md-4 col-xxl-2 text-center border-translucent border-start-xxl border-end border-end-xxl-0 pb-md-4 pb-xxl-0 pt-4 pt-xxl-0">
                 <span class="uil fs-5 lh-1 uil-video text-success"></span>
                 <h1 class="fs-5 pt-3">
@@ -206,7 +206,7 @@ $totalAnnee = $totalPayeAnnee + $totalPartielAnnee;
                     }
                   ?>
                 </h1>
-                <p class="fs-9 mb-0">Vidéos ADCI TV</p>
+                <p class="fs-9 mb-0">Vidéos ANVDKO TV</p>
               </div>
               
               <!-- Utilisateurs actifs -->
@@ -234,7 +234,7 @@ $totalAnnee = $totalPayeAnnee + $totalPartielAnnee;
             <div class="row gx-6">
               <div class="col-12 col-md-12 col-lg-12 col-xl-12 mb-5 mb-md-3 mb-lg-5 mb-xl-2 mb-xxl-3">
                 <div class="scrollbar">
-                  <h3>Cotisations ADCI mensuelle/Annuelle</h3>
+                  <h3>Cotisations ANVDKO mensuelle / annuelle</h3>
                 </div>
                 
                 

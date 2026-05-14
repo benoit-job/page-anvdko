@@ -391,7 +391,7 @@ async function genererToutesLesCartesPDF(ids) {
                 const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
                 
                 // Chercher tous les conteneurs de cartes
-                let containers = iframeDoc.querySelectorAll('.card-flip-container');
+                let containers = iframeDoc.querySelectorAll('.member-card-pack');
                 console.log("Nombre de cartes trouvées:", containers.length);
                 
                 if (containers.length === 0) {
@@ -412,7 +412,7 @@ async function genererToutesLesCartesPDF(ids) {
                 updateProgress(0, totalCards, 'Préparation de la capture...');
 
                 for (let i = 0; i < containers.length; i++) {
-                    const container = containers[i];
+                    const pack = containers[i];
                     
                     // CAPTURER LE RECTO
                     let imgDataRecto = null;
@@ -422,26 +422,26 @@ async function genererToutesLesCartesPDF(ids) {
                     try {
                         updateProgress(i, totalCards, `Capture du recto ${i + 1}/${totalCards}...`);
 
-                        const recto = container.querySelector('.badge');
+                        const recto = pack.querySelector('.badge');
                         if (!recto) {
                             console.warn(`Recto ${i + 1} introuvable`);
                             continue;
                         }
                         
-                        // S'assurer que le recto est visible et le verso caché
-                        container.classList.remove('flipped');
+                        // S'assurer que le recto est visible
+                        pack.classList.remove('flipped');
                         
                         // Forcer l'affichage du recto
                         recto.style.display = 'block';
                         recto.style.visibility = 'visible';
                         recto.style.opacity = '1';
-                        recto.style.position = 'absolute';
+                        recto.style.position = 'relative';
                         recto.style.transform = 'none';
                         recto.style.backfaceVisibility = 'visible';
                         recto.style.zIndex = '10';
                         
                         // Masquer le verso pendant la capture du recto
-                        const verso = container.querySelector('.card-back');
+                        const verso = pack.querySelector('.card-back');
                         if (verso) {
                             verso.style.display = 'none';
                             verso.style.visibility = 'hidden';
@@ -538,8 +538,8 @@ async function genererToutesLesCartesPDF(ids) {
                     try {
                         updateProgress(i, totalCards, `Capture du verso ${i + 1}/${totalCards}...`);
 
-                        const verso = container.querySelector('.card-back');
-                        const recto = container.querySelector('.badge');
+                        const verso = pack.querySelector('.card-back');
+                        const recto = pack.querySelector('.badge');
                         
                         if (!verso) {
                             console.warn(`Verso ${i + 1} introuvable`);

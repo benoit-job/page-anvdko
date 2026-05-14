@@ -25,7 +25,11 @@ if(isset($_POST['modifiermembres']))
     $ville_commune     = strip_tags(htmlspecialchars(trim($_POST["ville_commune"])));
     $poste_occupe     = strip_tags(htmlspecialchars(trim($_POST["poste_occupe"])));
     $email        = strip_tags(htmlspecialchars(trim($_POST["email"])));
-    $password = strip_tags(htmlspecialchars(trim($_POST["password"])));
+    $passwordField = strip_tags(htmlspecialchars(trim($_POST["password"] ?? '')));
+    $passwordSql = '';
+    if ($passwordField !== '') {
+        $passwordSql = ", password = \"" . mysqli_real_escape_string($bdd, anvdko_password_hash($passwordField)) . "\"";
+    }
 
     if(isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) 
     {
@@ -54,12 +58,11 @@ if(isset($_POST['modifiermembres']))
                  lieu_naissance = \"$lieu_naissance\",
                  profession = \"$profession\",
                  nationnalite = \"$nationnalite\",
-                 date_naissance = \"$date_naissance\",
                  num_telephone = \"$num_telephone\", 
                  ville_commune = \"$ville_commune\",
                  poste_occupe = \"$poste_occupe\",
-                 email = \"$email\",
-                 password = \"$password\"
+                 email = \"$email\"
+                 $passwordSql
              WHERE id = ".$id_membre;
     mysqli_query($bdd, $query) or die("Requête non conforme"); 
 
@@ -479,7 +482,7 @@ body {
                                         <label class="form-label" for="password">Modifer Mot de passe</label>
                                         <div class="position-relative">
                                             <span class="fas fa-key text-body fs-9 position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%);"></span>
-                                            <input class="form-control ps-5 pe-5 password" id="password" type="password" name="password"  value="<?php echo $_SESSION["membres"]["password"];?>" />
+                                            <input class="form-control ps-5 pe-5 password" id="password" type="password" name="password" placeholder="Laisser vide pour ne pas changer" />
                                             <span class="fas fa-eye-slash text-body fs-9 position-absolute" id="toggle-password"
                                             onclick="togglePassword()" style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></span>
                                         </div>

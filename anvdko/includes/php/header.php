@@ -1,3 +1,11 @@
+<!-- ANVDKO Page Loader -->
+<div class="anvdko-page-loader" id="anvdkoLoader">
+  <img src="../assets/img/LOGO.jpg" alt="ANVDKO" class="loader-logo">
+  <div class="loader-bar"><div class="loader-bar-inner"></div></div>
+  <div class="loader-text">Chargement…</div>
+</div>
+<script>window.addEventListener('load',function(){var l=document.getElementById('anvdkoLoader');if(l)l.classList.add('loaded');});</script>
+
 <nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault">
   <div class="collapse navbar-collapse justify-content-between">
     <div class="navbar-logo">

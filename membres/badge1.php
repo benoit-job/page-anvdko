@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Badge Membre ADCI</title>
+  <title>Badge Membre ANVDKO</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
  :root {
@@ -512,7 +512,7 @@
         <div><span>Prénoms :</span> Jean Paul</div>
         <div><span>Né(e) le :</span> 15/01/1985 à Abidjan</div>
         <div><span style="width: 120px;">Lieu résidence :</span> Yopougon</div>
-        <div><span style="width: 120px;">N° d'adhésion :</span> ADCI-2023-0542</div>
+        <div><span style="width: 120px;">N° d'adhésion :</span> ANVDKO-2023-0542</div>
       </div>
 
       <div class="qr-section">
@@ -525,7 +525,7 @@
       <div class="footer">
         <div class="footer-left">
           <div><span>Contact :</span> +225 07 08 09 10 11</div>
-          <div style="visibility: hidden;"><span>Email :</span> contact@adci-ci.org</div>
+          <div style="visibility: hidden;"><span>Email :</span> anvdkocontact@gmail.com</div>
         </div>
         <div class="footer-right">
           <img src="signature.png" class="signature-img" alt="Signature"/>
@@ -549,8 +549,8 @@
       <div class="footer1">
         <div class="contacts1">
           <div><span>Tél :</span> +225 07 08 09 10 11 / 01 02 03 04 05</div>
-          <div><span>Email :</span> contact@adci-ci.org</div>
-          <div><span>Site web :</span> www.adci-ci.org</div>
+          <div><span>Email :</span> anvdkocontact@gmail.com</div>
+          <div><span>Site web :</span> anvdko.com</div>
         </div>
         <div class="qr1"></div>
       </div>
@@ -569,7 +569,7 @@
     // Génération du QR Code
     new QRious({
       element: document.getElementById('qrCode'),
-      value: 'https://www.adci-ci.org/membre/ADCI-2023-0542',
+      value: 'https://anvdko.rca-emergency.com/membre/ANVDKO-2023-0542',
       size: 70,
       background: '#ffffff',
       foreground: '#2c2664'
@@ -578,7 +578,7 @@
     // Génération du QR Code au verso
     new QRious({
       element: document.querySelector('.qr1'),
-      value: 'https://www.adci-ci.org',
+      value: 'https://anvdko.rca-emergency.com',
       size: 70,
       background: '#ffffff',
       foreground: '#2c2664'
@@ -606,7 +606,7 @@
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('carte-membre-adci.pdf');
+        pdf.save('carte-membre-anvdko.pdf');
       });
     }
   </script>

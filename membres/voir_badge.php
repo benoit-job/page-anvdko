@@ -145,7 +145,7 @@ if ($image === 'no_image.jpg') {
     .footer1 .qr1 {
       width: 70px;
       height: 70px;
-      background-image: url('https://adci.rca-emergency.com/fichiers/logos/index_qr_code.png'); /* QR code dynamique */
+      background-image: url('https://anvdko.rca-emergency.com/fichiers/logos/index_qr_code.png'); /* QR code dynamique */
       background-size: cover;
       background-position: center;
       border: 2px solid white;
@@ -229,7 +229,7 @@ if ($image === 'no_image.jpg') {
             <div class="contacts1">
                 Tél : +225 <?php echo $_SESSION["configuration"]["contact1"];?> / <?php echo $_SESSION["configuration"]["contact2"];?><br>
                 Email : <?php echo $_SESSION["configuration"]["email"];?><br>
-                Site web : www.adci-ci.org
+                Site web : anvdko.rca-emergency.com
             </div>
             <div class="qr1"></div>
         </div>

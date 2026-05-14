@@ -2,6 +2,10 @@
 
 $bdd = mysqli_connect("localhost","root","","anvdko_oussoukro") or die("Problème de connection dans bdd");
 
+if (file_exists(__DIR__ . '/password_helper.php')) {
+    include_once __DIR__ . '/password_helper.php';
+}
+
 mysqli_query($bdd, "SET NAMES utf8") or die("Requête non conforme1111"); //mettre les caracteres en français
 
 mysqli_query($bdd, "SET lc_time_names = 'fr_FR'") or die("Requête non conforme2222");//mettre la date en francais pour mysql

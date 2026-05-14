@@ -16,7 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
     $genre     = strip_tags(htmlspecialchars(trim($_POST["genre"])));
     $num_telephone     = strip_tags(htmlspecialchars(trim($_POST["num_telephone"])));
     $ville_commune     = strip_tags(htmlspecialchars(trim($_POST["ville_commune"])));
-    $password     = strip_tags(htmlspecialchars(trim($_POST["password"])));
+    $passwordPlain = strip_tags(htmlspecialchars(trim($_POST["password"])));
+    $passwordHash = anvdko_password_hash($passwordPlain);
+    $passwordSql = mysqli_real_escape_string($bdd, $passwordHash);
 
     $jour = (int) $_POST["jour"];
     $mois = (int) $_POST["mois"];
@@ -65,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
                       \"$date_naissance\",  
                       \"$num_telephone\", 
                       \"$ville_commune\", 
-                      \"$password\", 
+                      \"$passwordSql\", 
                       \"$ev_annee\",
                     \"$ev_ordre\",
                     \"$n_adhesion\",  

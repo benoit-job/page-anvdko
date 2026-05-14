@@ -367,7 +367,7 @@ function date_min_max_limit($nom_annee)
     return $date_limit;
 }
 
-// Génère un numéro d'adhésion de type ADCI-2025-001
+// Génère un numéro d'adhésion de type ANVDKO-2025-001
 function generer_numero_adhesion($bdd)
 {
     $annee = date('y'); // année sur 2 chiffres (ex: 25)
@@ -1315,11 +1315,14 @@ function getUrlFichier($fichier)
     } 
     else 
     {
-        return 'https://anvdko.rca-emergency.com//fichiers/images/no_image.jpg';
+        return '../assets/img/LOGO.jpg';
     }
 }
 function getUrlUtilisateur($image)
 {
+    if (empty($image)) {
+        return '../assets/img/LOGO.jpg';
+    }
     $url_image = 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$image;
 
     if(strlen(@file_get_contents($url_image)) > 0) 
@@ -1328,7 +1331,7 @@ function getUrlUtilisateur($image)
     } 
     else 
     {
-        return 'httpss://applihotels.com/application/fichiers/icons/utilisateurs2.png';
+        return '../assets/img/LOGO.jpg';
     }
 }
 
@@ -1341,7 +1344,7 @@ function setSrcImg($lienImage)
     } 
     else
     {
-        return 'https://anvdko.rca-emergency.com//fichiers/images/no_image.jpg';
+        return '../assets/img/LOGO.jpg';
     }
 }
 
@@ -1353,7 +1356,7 @@ function AffImagSite($lienImage)
     } 
     else
     {
-        return 'https://anvdko.rca-emergency.com//fichiers/images/no_image.jpg';
+        return '../assets/img/LOGO.jpg';
     }
 }
 function safe_safe_ucfirst($value) {

@@ -58,8 +58,22 @@
     </script>
   </head>
 
+  <body class="login-watermark">
 
-  <body>
+    <style>
+      body.login-watermark { position: relative; min-height: 100vh; }
+      body.login-watermark::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: url('../assets/img/LOGO.jpg') center 42% no-repeat;
+        background-size: min(480px, 85vw) auto;
+        opacity: 0.07;
+        pointer-events: none;
+        z-index: 0;
+      }
+      body.login-watermark #top { position: relative; z-index: 1; }
+    </style>
 
     <!-- ===============================================-->
     <!--    Main Content-->
@@ -70,34 +84,27 @@
             <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-3">
                 <div class="text-center mb-5">
                     <div class="avatar avatar-4xl mb-4">
-                    <img class="rounded-circle" src="../fichiers/logos/favicon.ico" alt="" />
+                    <img class="rounded-circle" src="../assets/img/LOGO.jpg" alt="ANVDKO" style="object-fit:cover;" />
                     </div>
                     <h2 class="text-body-highlight"> <span class="fw-normal"></span>Compte administrateur</h2>
-                    <p class="text-body-tertiary">Entrez votre mot de passe pour accéder à l'administration</p>
+                    <p class="text-body-tertiary">Identifiant (pseudo, téléphone ou e-mail) et mot de passe</p>
                 </div>
                 <div class="position-relative">
                     <hr class="bg-body-secondary mt-5 mb-4" />
                     <div class="divider-content-center">Connexion au compte</div>
                 </div>
                 <div class="mb-3 text-start">
-                    <label class="form-label" for="pseudo">Utilisateur</label>
+                    <label class="form-label" for="login_identifier">Utilisateur ou téléphone ou e-mail</label>
                     <div class="form-icon-container">
-                    <input class="form-control form-icon-input" id="pseudo" type="text" name="pseudo" placeholder="adci" required/>
+                    <input class="form-control form-icon-input" id="login_identifier" type="text" name="login_identifier" placeholder="Pseudo, n° téléphone ou e-mail" autocomplete="username" required/>
                     <span class="fas fa-user text-body fs-9 form-icon"></span>
-                    </div>
-                </div>
-                <div class="mb-3 text-start">
-                    <label class="form-label" for="telephone">Téléphone</label>
-                    <div class="form-icon-container">
-                    <input class="form-control form-icon-input" id="telephone" name="telephone" type="tel" placeholder="0789711116"  required/>
-                    <span class="fas fa-phone-alt text-body fs-9 form-icon"></span>
                     </div>
                 </div>
                 <div class="mb-3 text-start">
                     <label class="form-label" for="password">Mot de passe</label>
                     <div class="position-relative">
                         <span class="fas fa-key text-body fs-9 position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%);"></span>
-                        <input class="form-control ps-5 pe-5 password" id="password" type="password" name="password" placeholder="adci02ci" required/>
+                        <input class="form-control ps-5 pe-5 password" id="password" type="password" name="password" placeholder="Mot de passe" autocomplete="current-password" required/>
                         <span class="fas fa-eye-slash text-body fs-9 position-absolute" id="toggle-password"
                         onclick="togglePassword()" style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></span>
                     </div>
@@ -171,8 +178,7 @@
    
     $("#connexions").click(function(){
 
-        var pseudo    = $('#pseudo').val();
-        var telephone = $('#telephone').val();
+        var loginId = $('#login_identifier').val();
         var password = $('.password').val();
 
         $("#connexions").html("<div class='spinner-border spinner-border-sm' role='status'></div> Connexion en cours....");
@@ -182,8 +188,7 @@
                 url: "ajax.php",
                 method: "POST",
                 data: {
-                    'pseudo': pseudo,
-                    'telephone': telephone,
+                    'login_identifier': loginId,
                     'password': password,
                     'connexion': ''
                 },

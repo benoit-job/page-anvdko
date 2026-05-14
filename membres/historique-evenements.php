@@ -74,13 +74,18 @@ $queryPast = "SELECT * FROM evenements
 $resultPast = mysqli_query($bdd, $queryPast) or die("Erreur requête événements passés");
 
 while ($event = mysqli_fetch_array($resultPast)) {
-    $dateDebut = new DateTime($event['date_debut']);
-    $dateFin = new DateTime($event['date_fin']);
+    $ds = $event['date_debut'] ?? '';
+    if ($ds === null || $ds === '' || trim($ds) === '') {
+        continue;
+    }
+    $df = (!empty($event['date_fin']) && $event['date_fin'] !== null) ? $event['date_fin'] : $ds;
+    $dateDebut = new DateTime((string)$ds);
+    $dateFin = new DateTime((string)$df);
 
     $category = 'Important';
     $badgeClass = 'bg-primary';
 
-    $titreLower = strtolower($event['titre']);
+    $titreLower = strtolower((string)($event['titre'] ?? ''));
     if (strpos($titreLower, 'atelier') !== false) {
         $category = 'Loisir';
         $badgeClass = 'bg-success';
@@ -101,10 +106,10 @@ while ($event = mysqli_fetch_array($resultPast)) {
                 </div>
                 <div class="col-9">
                     <div class="card-body">
-                        <h5 class="card-title"><?= htmlspecialchars($event['titre']) ?></h5>
+                        <h5 class="card-title"><?= htmlspecialchars((string)($event['titre'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h5>
                         <p class="card-text text-muted small">
                             <i class="bi bi-clock"></i> <?= $dateDebut->format('H:i') ?> - <?= $dateFin->format('H:i') ?><br>
-                            <i class="bi bi-geo-alt"></i> <?= htmlspecialchars($event['lieu']) ?>
+                            <i class="bi bi-geo-alt"></i> <?= htmlspecialchars((string)($event['lieu'] ?? ''), ENT_QUOTES, 'UTF-8') ?>
                         </p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>

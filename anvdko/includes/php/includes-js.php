@@ -95,4 +95,21 @@ function spinnerBtn(element, affiche)
     if(affiche){$(element).prepend("<div class='spinner-border spinner-border-sm me-2' style='width: 12px; height: 12px;' role='status'></div>");} 
     else{$(element).find('.spinner-border').remove();}
 }
+
+/* Chargement plein écran (navigation) */
+(function(){
+  if (document.getElementById('anvdko-page-loader')) return;
+  var css = '#anvdko-page-loader{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:20000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .35s ease;}' +
+            '#anvdko-page-loader.anvdko-hide{opacity:0;pointer-events:none;}';
+  var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+  var d = document.createElement('div');
+  d.id = 'anvdko-page-loader';
+  d.innerHTML = '<img src="assets/img/LOGO.jpg" width="72" height="72" class="rounded-circle mb-3" style="object-fit:cover;box-shadow:0 8px 32px rgba(74,20,140,.2)" alt="">' +
+                '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement…</span></div>';
+  document.body.appendChild(d);
+  window.addEventListener('load', function(){
+    d.classList.add('anvdko-hide');
+    setTimeout(function(){ d.style.display = 'none'; }, 400);
+  });
+})();
 </script>

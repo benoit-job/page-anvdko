@@ -61,10 +61,11 @@ include("../include/php/fonctions.php");
         $ancien_mdp    = strip_tags(htmlspecialchars(trim($_POST['ancien_mdp'])));
         $nouveau_mdp   = strip_tags(htmlspecialchars(trim($_POST['nouveau_mdp'])));
         $confirmer_mdp = strip_tags(htmlspecialchars(trim($_POST['confirmer_mdp'])));
-        if( $_SESSION['utilisateur']['password'] == $ancien_mdp AND $nouveau_mdp == $confirmer_mdp )
+        if( anvdko_password_verify($ancien_mdp, $_SESSION['utilisateur']['password'] ?? '') AND $nouveau_mdp == $confirmer_mdp AND strlen($nouveau_mdp) >= 6 )
         {
+          $nh = mysqli_real_escape_string($bdd, anvdko_password_hash($confirmer_mdp));
           $query = "UPDATE utilisateurs 
-                    SET password = ".empty_to_NULL($confirmer_mdp)."
+                    SET password = \"$nh\"
                     WHERE id_configuration = ".$_SESSION['configuration']['id']." AND id =".$_SESSION['utilisateur']['id'];
           if(@mysqli_query($bdd, $query))
           {

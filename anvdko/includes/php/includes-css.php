@@ -24,6 +24,8 @@
     <link href="assets/css/user.min.css" type="text/css" rel="stylesheet" id="user-style-default">
     <link href="vendors/flatpickr/flatpickr.min.css" rel="stylesheet" />
     
+    <link href="assets/css/anvdko-brand.css" rel="stylesheet" />
+    <link href="../assets/css/anvdko-loader.css" rel="stylesheet" />
     <style type="text/css">
       .table th, table td{padding: 5px 5px !important; vertical-align: middle !important;font-size: 0.8rem;}
       .table tbody, .table thead{white-space: nowrap;}

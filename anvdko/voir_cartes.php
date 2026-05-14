@@ -38,6 +38,13 @@ $logoPath = "../fichiers/uploads/" . $configLogo;
 if ($configLogo === 'no_image.jpg') {
     $logoPath = "../assets/img/LOGO.jpg";
 }
+
+$cfgTel = trim(($configuration['contact1'] ?? '') . (($configuration['contact2'] ?? '') !== '' ? ' / ' . ($configuration['contact2'] ?? '') : ''));
+if ($cfgTel === '') {
+    $cfgTel = '+225 07 08 09 10 11 / 01 02 03 04 05';
+}
+$cfgEmail = !empty($configuration['email']) ? $configuration['email'] : 'anvdkocontact@gmail.com';
+$cfgNom = !empty($configuration['nom']) ? $configuration['nom'] : 'ANVDKO';
 ?>
 
 <!DOCTYPE html>
@@ -102,53 +109,29 @@ if ($configLogo === 'no_image.jpg') {
         }
 
         .cartes-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-            gap: 50px;
-            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 48px;
+            max-width: 560px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        .carte-individuelle {
-            perspective: 1500px;
+        .member-card-pack {
+            width: 500px;
             margin: 0 auto;
+        }
+
+        .member-card-pack .badge,
+        .member-card-pack .card-back {
             position: relative;
+            transform: none !important;
+            backface-visibility: visible !important;
         }
 
-        .card-flip-container {
-            width: 500px;
-            height: 310px;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
-        }
-
-        .card-flip-container.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .badge, .card-back {
-            width: 500px;
-            height: 310px;
-            position: absolute;
-            backface-visibility: hidden;
-            border-radius: 20px;
-            overflow: hidden;
-            background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary-light) 100%);
-            color: var(--white);
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(44, 38, 100, 0.4);
-            border: 1px solid rgba(255, 222, 89, 0.3);
-        }
-
-        .badge {
-            z-index: 2;
-        }
-
-        .card-back {
-            transform: rotateY(180deg);
-            padding: 25px;
+        .member-card-pack .card-back {
+            margin-top: 28px;
         }
 
         .background-logo {
@@ -165,11 +148,109 @@ if ($configLogo === 'no_image.jpg') {
             filter: drop-shadow(0 0 10px rgba(255, 222, 89, 0.3));
         }
 
+        .badge {
+            width: 500px;
+            height: 310px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(44, 38, 100, 0.4);
+            border: 1px solid rgba(255, 222, 89, 0.3);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .badge:hover {
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 15px 35px rgba(44, 38, 100, 0.5);
+        }
+
+        /* Effet de brillance dynamique */
+        .badge::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 40%,
+                rgba(255, 255, 255, 0.1) 45%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0.1) 55%,
+                rgba(255, 255, 255, 0) 60%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 5s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            20% { transform: translateX(100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        .card-back {
+            width: 500px;
+            height: 310px;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(145deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(44, 38, 100, 0.4);
+            border: 1px solid rgba(255, 222, 89, 0.3);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .card-back::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 40%,
+                rgba(255, 255, 255, 0.1) 45%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0.1) 55%,
+                rgba(255, 255, 255, 0) 60%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 5s infinite 1s;
+        }
+
+        /* Animation de flottement */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .member-card-pack:hover .badge {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .member-card-pack:hover .card-back {
+            animation: float 3s ease-in-out infinite 0.5s;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 15px;
             position: relative;
             z-index: 2;
         }
@@ -182,26 +263,27 @@ if ($configLogo === 'no_image.jpg') {
 
         .title-text h2 {
             margin: 0;
-            font-size: 11px;
+            font-size: 12px;
             font-style: italic;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: var(--accent-gold);
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             line-height: 1.3;
         }
 
         .title-text small {
-            font-size: 10px;
+            font-size: 13px;
+            padding-left: 5%;
             color: rgba(255,255,255,0.8);
             display: block;
-            margin-top: 3px;
+            margin-top: 5px;
             font-style: italic;
         }
 
         .logo {
-            width: 65px;
-            height: 65px;
+            width: 70px;
+            height: 70px;
             background: var(--white);
             border-radius: 10px;
             background-image: url('../assets/img/LOGO.jpg');
@@ -215,14 +297,15 @@ if ($configLogo === 'no_image.jpg') {
 
         .milieu {
             text-align: center;
-            margin: 8px 0 12px 0;
+            margin: 20px 0;
             position: relative;
             z-index: 2;
         }
 
         .milieu h3 {
             margin: 0;
-            font-size: 16px;
+            margin-left: 10%;
+            font-size: 18px;
             color: var(--white);
             letter-spacing: 1.5px;
             font-style: italic;
@@ -235,20 +318,20 @@ if ($configLogo === 'no_image.jpg') {
         .milieu h3::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: -8px;
             left: 25%;
             width: 50%;
-            height: 2px;
+            height: 3px;
             background: var(--accent-gold);
             border-radius: 3px;
         }
 
         .photo {
             position: absolute;
-            top: 105px;
+            top: 120px;
             left: 20px;
-            width: 105px;
-            height: 125px;
+            width: 110px;
+            height: 130px;
             background: var(--white);
             border: 3px solid #7E4C74;
             background-size: cover;
@@ -259,9 +342,9 @@ if ($configLogo === 'no_image.jpg') {
         }
 
         .info {
-            margin-left: 135px;
-            margin-top: 5px;
-            font-size: 12.5px;
+            margin-left: 140px;
+            margin-top: 20px;
+            font-size: 15px;
             line-height: 1.8;
             position: relative;
             z-index: 2;
@@ -271,43 +354,45 @@ if ($configLogo === 'no_image.jpg') {
             font-weight: bold;
             color: var(--accent-gold);
             display: inline-block;
-            width: 110px;
+            width: 80px;
         }
 
         .info div {
             border-bottom: 1px dashed rgba(255,255,255,0.2);
-            padding: 3px 0;
-            margin-bottom: 3px;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
         }
 
         .qr-section {
             position: absolute;
-            right: 18px;
-            bottom: 88px;
+            right: 10px;
+            bottom: 90px;
             text-align: center;
             z-index: 2;
         }
 
         .qr-code {
-            width: 52px;
-            height: 52px;
+            width: 60px;
+            height: 60px;
             background-color: var(--white);
             border-radius: 8px;
-            margin: 0 auto 6px auto;
+            margin: 0 auto;
             background-size: cover;
             background-position: center;
-            padding: 3px;
-            border: 2px solid #7E4C74;
+            padding: 5px;
+            margin-right: auto;
+            border: 5px solid #7E4C74;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .badge-type {
+            margin-top: 8px;
             background: linear-gradient(90deg, #ff9800, #cddc39);
             color: var(--primary-dark);
-            padding: 3px 8px;
+            padding: 5px 10px;
             font-weight: bold;
-            font-size: 10px;
-            border-radius: 12px;
+            font-size: 13px;
+            border-radius: 20px;
             display: inline-block;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
@@ -316,9 +401,9 @@ if ($configLogo === 'no_image.jpg') {
             border: 0;
             height: 2px;
             background: linear-gradient(to right, transparent, var(--accent-gold), transparent);
-            margin: 0;
+            margin: 15px 0;
             position: absolute;
-            bottom: 65px;
+            bottom: 70px;
             width: 90%;
             left: 5%;
             z-index: 2;
@@ -326,13 +411,13 @@ if ($configLogo === 'no_image.jpg') {
 
         .footer {
             position: absolute;
-            bottom: 12px;
+            bottom: 15px;
             left: 0;
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 10px;
+            font-size: 12px;
             color: rgba(255,255,255,0.8);
             padding: 0 20px;
             box-sizing: border-box;
@@ -340,7 +425,7 @@ if ($configLogo === 'no_image.jpg') {
         }
 
         .footer-left div {
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
         .footer-left span {
@@ -349,8 +434,8 @@ if ($configLogo === 'no_image.jpg') {
         }
 
         .signature-img {
-            width: 65px;
-            height: 14px;
+            width: 70px;
+            height: 15px;
             background-color: rgba(255, 255, 255, 0.2);
             padding: 0;
             border-radius: 5px;
@@ -419,13 +504,13 @@ if ($configLogo === 'no_image.jpg') {
 
         .footer1 {
             position: absolute;
-            bottom: 18px;
+            bottom: 20px;
             left: 25px;
             right: 25px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            font-size: 11px;
+            font-size: 12px;
             z-index: 2;
         }
 
@@ -446,48 +531,17 @@ if ($configLogo === 'no_image.jpg') {
         }
 
         .qr1 {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             background-color: var(--white);
             background-image: url('../assets/img/gr_code.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 8px;
-            padding: 4px;
-            border: 2px solid var(--accent-gold);
+            padding: 5px;
+            border: 3px solid var(--accent-gold);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .flip-button {
-            position: absolute;
-            bottom: 15px;
-            right: 15px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: 2px solid var(--accent-gold);
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            font-size: 16px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-
-        .flip-button:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: scale(1.1);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-        }
-
-        /* Empêcher le bouton flip d'apparaître dans les captures */
-        .capturing .flip-button {
-            display: none !important;
         }
 
         @media print {
@@ -497,8 +551,7 @@ if ($configLogo === 'no_image.jpg') {
             }
 
             .page-title,
-            .actions-impression,
-            .flip-button {
+            .actions-impression {
                 display: none;
             }
 
@@ -507,35 +560,25 @@ if ($configLogo === 'no_image.jpg') {
                 padding: 0;
             }
 
-            .carte-individuelle {
+            .member-card-pack {
                 page-break-inside: avoid;
-                margin-bottom: 30px;
+                margin-bottom: 24px;
                 break-inside: avoid;
-            }
-
-            .card-flip-container {
-                transform: none !important;
             }
 
             .badge, .card-back {
                 position: relative;
                 page-break-inside: avoid;
-                margin-bottom: 20px;
-            }
-
-            .card-back {
-                transform: none !important;
-                backface-visibility: visible;
+                margin-bottom: 16px;
             }
         }
 
         @media (max-width: 768px) {
             .cartes-container {
-                grid-template-columns: 1fr;
                 gap: 30px;
             }
 
-            .badge, .card-back, .card-flip-container {
+            .badge, .card-back, .member-card-pack {
                 width: 100%;
                 max-width: 500px;
             }
@@ -577,58 +620,51 @@ if ($configLogo === 'no_image.jpg') {
             }
             ?>
             
-            <div class="carte-individuelle">
-                <div class="card-flip-container" id="card-<?php echo $membre['id']; ?>">
-                    <!-- Recto -->
+            <div class="member-card-pack" id="pack-<?php echo (int)$membre['id']; ?>">
                     <div class="badge">
-                        <div class="background-logo" style="background-image: url('<?php echo $logoPath; ?>');"></div>
+                        <div class="background-logo" style="background-image: url('<?php echo htmlspecialchars($logoPath); ?>');"></div>
                         <div class="header">
                             <div class="title-text">
-                                <h2>Association de la Nouvelle Vision pour le<br>Développement de Kouakou Oussoukro</h2>
+                                <h2>Association de la Nouvelle Vision pour le <br> Développement de Kouakou Oussoukro</h2>
                                 <small>« Une jeunesse, une vision, un avenir pour Kouakou Oussoukro ! »</small>
                             </div>
                             <div class="logo"></div>
                         </div>
 
                         <div class="milieu">
-                            <h3>Carte de Membre ANVDKO</h3>
+                            <h3>CARTE DE MEMBRE ANVDKO</h3>
                         </div>
 
-                        <div class="photo" style="background-image: url('<?php echo $imagePath; ?>');"></div>
+                        <div class="photo" style="background-image: url('<?php echo htmlspecialchars($imagePath); ?>');"></div>
 
                         <div class="info">
-                            <div><span>Nom :</span> <?php echo strtoupper($membre["nom"] ?? ''); ?></div>
-                            <div><span>Prénoms :</span> <?php echo safe_ucfirst($membre["prenom"] ?? ''); ?></div>
-                            <div><span>Né(e) le :</span> <?php echo $membre["date_naissance"] ?? ''; ?></div>
-                            <div><span>Lieu résidence :</span> <?php echo strtoupper($membre["ville_commune"] ?? ''); ?></div>
-                            <div><span>N° d'adhésion :</span> <?php echo $membre["num_adhesion"] ?? ''; ?></div>
+                            <div><span>Nom :</span> <?php echo htmlspecialchars(strtoupper($membre["nom"] ?? '')); ?></div>
+                            <div><span>Prénoms :</span> <?php echo htmlspecialchars(safe_ucfirst($membre["prenom"] ?? '')); ?></div>
+                            <div><span>Né(e) le :</span> <?php echo htmlspecialchars($membre["date_naissance"] ?? ''); ?></div>
+                            <div><span style="width:120px;">Lieu résidence :</span> <?php echo htmlspecialchars(strtoupper($membre["ville_commune"] ?? '')); ?></div>
+                            <div><span style="width:120px;">N° d'adhésion :</span> <?php echo htmlspecialchars($membre["num_adhesion"] ?? ''); ?></div>
                         </div>
 
                         <div class="qr-section">
-                            <div class="qr-code qr-code-<?php echo $membre['id']; ?>"></div>
-                            <div class="badge-type"><?php echo strtoupper($membre["poste_occupe"] ?? 'MEMBRE'); ?></div>
+                            <div class="qr-code qr-code-<?php echo (int)$membre['id']; ?>"></div>
+                            <div class="badge-type"><?php echo htmlspecialchars(strtoupper($membre["poste_occupe"] ?? 'MEMBRE')); ?></div>
                         </div>
 
                         <hr>
 
                         <div class="footer">
                             <div class="footer-left">
-                                <div><span>Contact :</span> <?php echo $membre["num_telephone"] ?? ''; ?></div>
-                                <div><span>Email :</span> <?php echo $membre["email"] ?? ''; ?></div>
+                                <div><span>Contact :</span> <?php echo htmlspecialchars($membre["num_telephone"] ?? ''); ?></div>
+                                <div style="visibility:hidden;"><span>Email :</span> <?php echo htmlspecialchars($membre["email"] ?? ''); ?></div>
                             </div>
                             <div class="footer-right">
                                 <?php if (!empty($signature)): ?>
-                                <img src="<?php echo $signature; ?>" class="signature-img" alt="Signature"/>
+                                <img src="<?php echo htmlspecialchars($signature); ?>" class="signature-img" alt=""/>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        
-                        <button class="flip-button" onclick="flipCard(<?php echo $membre['id']; ?>)" title="Voir le verso">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
                     </div>
 
-                    <!-- Verso -->
                     <div class="card-back">
                         <div class="background-logo1"></div>
                         
@@ -645,32 +681,19 @@ if ($configLogo === 'no_image.jpg') {
 
                         <div class="footer1">
                             <div class="contacts1">
-                                <div><span>Tél :</span> +225 07 08 09 10 11 / 01 02 03 04 05</div>
-                                <div><span>Email :</span> anvdkocontact@gmail.com</div>
-                                <div><span>Site web :</span> www.anvdko.com</div>
+                                <div><span>Tél :</span> <?php echo htmlspecialchars($cfgTel); ?></div>
+                                <div><span>Email :</span> <?php echo htmlspecialchars($cfgEmail); ?></div>
+                                <div><span>Association :</span> <?php echo htmlspecialchars($cfgNom); ?></div>
                             </div>
                             <div class="qr1"></div>
                         </div>
-                        
-                        <button class="flip-button" onclick="flipCard(<?php echo $membre['id']; ?>)" title="Voir le recto">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
                     </div>
-                </div>
             </div>
         <?php endforeach; ?>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
     <script>
-        // Fonction pour retourner une carte
-        function flipCard(memberId) {
-            const card = document.getElementById('card-' + memberId);
-            if (card) {
-                card.classList.toggle('flipped');
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             // Générer tous les QR codes
             <?php foreach ($membres as $membre): ?>

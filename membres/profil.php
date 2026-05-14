@@ -40,7 +40,7 @@ if (!empty($membre["date_adhesion"])) {
     $timestamp = strtotime($membre["date_adhesion"]);
     
     if ($timestamp) {
-        $date_adhesion = strftime('%d %B %Y', $timestamp); 
+        $date_adhesion = date('d', $timestamp) . ' ' . mois_fr(date('n', $timestamp)) . ' ' . date('Y', $timestamp); 
         $annee_adhesion = date('Y', $timestamp);
     }
 }
@@ -475,7 +475,7 @@ $activity_result = mysqli_query($bdd, $activity_query);
                             
                             <?php if (!empty($membre['date_adhesion'])): ?>
                             <li class="mb-2">
-                                <strong>Membre depuis:</strong> <?php echo date('F Y', strtotime($membre['date_adhesion'])); ?>
+                                <strong>Membre depuis:</strong> <?php echo mois_fr(date('n', strtotime($membre['date_adhesion']))) . ' ' . date('Y', strtotime($membre['date_adhesion'])); ?>
                             </li>
                             <?php endif; ?>
                             
