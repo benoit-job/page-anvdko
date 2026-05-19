@@ -4482,7 +4482,7 @@
     if (mapboxContainers) {
       mapboxContainers.forEach(mapboxContainer => {
         window.mapboxgl.accessToken =
-          '';
+          ''; // TODO: Add your Mapbox public access token
 
         const mapbox = mapboxContainer.querySelector('[data-mapbox]');
         if (mapbox) {
@@ -4543,7 +4543,7 @@
     const $flightMap = document.querySelector('#flightMap');
     if ($flightMap) {
       window.mapboxgl.accessToken =
-        '';
+        ''; // TODO: Add your Mapbox public access token
 
       const zoomIn = document.querySelector('.zoomIn');
       const zoomOut = document.querySelector('.zoomOut');
