@@ -1,15 +1,15 @@
 /* ============================================================
-   ANVDKO — Spinner overlay de chargement de page
+   ANVDKO — Loader cercle de progression violet
    ============================================================ */
 
-/* Overlay plein-écran */
+/* Overlay plein-écran — fond clair opaque */
 .anvdko-page-loader {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.92);
+  background: #f5f3f8;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -24,57 +24,77 @@
   pointer-events: none;
 }
 
-/* Logo qui pulse */
+/* Conteneur du cercle + logo */
+.loader-circle-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* SVG cercle de progression */
+.loader-circle-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px;
+  transform: rotate(-90deg);
+}
+
+/* Cercle de fond (track clair) */
+.loader-circle-track {
+  fill: none;
+  stroke: #e0d4eb;
+  stroke-width: 10;
+}
+
+/* Cercle de progression violet épais */
+.loader-circle-progress {
+  fill: none;
+  stroke: #4A148C;
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-dasharray: 534;
+  stroke-dashoffset: 534;
+  transition: stroke-dashoffset 0.1s ease;
+}
+
+/* Anneau intérieur décoratif (plus fin, violet clair) */
+.loader-inner-ring {
+  fill: none;
+  stroke: #c9b3db;
+  stroke-width: 4;
+}
+
+/* Logo au centre — rond, assez gros */
 .anvdko-page-loader .loader-logo {
-  width: 80px;
-  height: 80px;
-  border-radius: 16px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   object-fit: cover;
-  animation: anvdko-pulse 1.5s ease-in-out infinite;
-  box-shadow: 0 8px 32px rgba(74, 20, 140, 0.2);
+  border: 3px solid #e0d4eb;
+  box-shadow: 0 4px 20px rgba(74, 20, 140, 0.12);
+  z-index: 2;
 }
 
-@keyframes anvdko-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 8px 32px rgba(74, 20, 140, 0.2);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow: 0 12px 40px rgba(74, 20, 140, 0.35);
-  }
-}
-
-/* Barre de chargement sous le logo */
-.anvdko-page-loader .loader-bar {
-  width: 120px;
-  height: 4px;
-  background: #e8e0f0;
-  border-radius: 4px;
-  margin-top: 20px;
-  overflow: hidden;
-}
-
-.anvdko-page-loader .loader-bar-inner {
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(90deg, #4a148c, #6a1b9a, #f39c12);
-  border-radius: 4px;
-  animation: anvdko-bar 1.2s ease-in-out infinite;
-}
-
-@keyframes anvdko-bar {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(350%); }
+/* Pourcentage sous le cercle */
+.loader-percent {
+  margin-top: 16px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #4A148C;
+  letter-spacing: 1px;
 }
 
 /* Texte de chargement */
 .anvdko-page-loader .loader-text {
-  margin-top: 14px;
+  margin-top: 12px;
   font-family: 'Nunito Sans', sans-serif;
-  font-size: 13px;
-  color: #6a1b9a;
+  font-size: 15px;
+  color: #7a6b8a;
   letter-spacing: 1px;
-  text-transform: uppercase;
-  font-weight: 600;
 }

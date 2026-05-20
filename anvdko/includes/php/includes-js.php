@@ -98,7 +98,7 @@ function spinnerBtn(element, affiche)
 
 /* Chargement plein écran (navigation) */
 (function(){
-  if (document.getElementById('anvdko-page-loader')) return;
+  if (document.getElementById('anvdko-page-loader') || document.getElementById('anvdkoLoader')) return;
   var css = '#anvdko-page-loader{position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:20000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .35s ease;}' +
             '#anvdko-page-loader.anvdko-hide{opacity:0;pointer-events:none;}';
   var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
