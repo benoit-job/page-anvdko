@@ -137,22 +137,28 @@
 })();
 </script>
 
-<nav class="navbar navbar-top fixed-top navbar-expand" id="navbarDefault">
-  <div class="collapse navbar-collapse justify-content-between">
-    <div class="navbar-logo">
-
-      <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation"><span class="navbar-toggle-icon"><span class="toggle-line"></span></span></button>
-      <a class="navbar-brand me-1 me-sm-3" href="accueil.php">
-        <div class="d-flex align-items-center">
-          <div class="d-flex align-items-center">
-            <img src="<?php echo getUrlFichier($_SESSION["configuration"]["logo"]);?>" alt="logo" class="rounded" width="45" height="35"/>
-            <p class="logo-text ms-2 d-none d-sm-block"><?php echo safe_safe_ucfirst($_SESSION["configuration"]["nom"]);?></p>
-          </div>
-        </div>
+<nav class="navbar navbar-top fixed-top navbar-expand-lg" id="navbarDefault">
+  <style>
+    /* Hamburger three lines */
+    .navbar-toggle-icon .toggle-line { display:block; width:20px; height:2px; background:#333; margin:3px 0; border-radius:2px; }
+    @media (min-width: 992px) { .navbar-toggler.d-lg-none { display:none !important; } }
+  </style>
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <button class="btn navbar-toggler navbar-toggler-humburger-icon hover-bg-transparent me-2 d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarVerticalCollapse" aria-controls="navbarVerticalCollapse" aria-expanded="false" aria-label="Toggle Navigation">
+        <span class="navbar-toggle-icon">
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+        </span>
+      </button>
+      <a class="navbar-brand me-1 me-sm-3 d-flex align-items-center" href="accueil.php">
+        <img src="<?php echo getUrlFichier($_SESSION["configuration"]["logo"]);?>" alt="logo" class="rounded" width="45" height="35"/>
+        <p class="logo-text ms-2 d-none d-sm-block mb-0"><?php echo safe_safe_ucfirst($_SESSION["configuration"]["nom"]);?></p>
       </a>
     </div>
-    
-    <ul class="navbar-nav navbar-nav-icons flex-row">
+    <div class="d-flex align-items-center">
+      <ul class="navbar-nav navbar-nav-icons flex-row">
       <li class="nav-item">
         <div class="theme-control-toggle fa-icon-wait px-2">
           <input class="form-check-input ms-0 theme-control-toggle-input" type="checkbox" data-theme-control="phoenixTheme" value="dark" id="themeControlToggle" />
@@ -197,5 +203,6 @@
         </div>
       </li>
     </ul>
+    </div>
   </div>
 </nav>
