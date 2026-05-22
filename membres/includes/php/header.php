@@ -143,7 +143,7 @@
 
 <!-- Premier bloc -->
 <a href="accueil.php" style="display: flex; align-items: center; text-decoration: none;">
-    <img src="../../assets/img/LOGO.jpg" height="40" class="rounded" style="margin-right: 3px;">
+    <img src="../assets/img/LOGO.jpg" height="40" class="rounded" style="margin-right: 3px;">
     <div style="display: flex; flex-direction: column; justify-content: space-between;">
         <b style="color: black;">MEMBRE ANVDKO</b>
         <span class="badge" style="font-size: 10px; padding: 2px; background: linear-gradient(45deg, #ff8c00, #6a5acd, #00ced1, #ff1493);">

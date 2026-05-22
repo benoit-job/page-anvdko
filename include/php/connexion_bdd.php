@@ -1,6 +1,6 @@
 <?php
 
-$bdd = mysqli_connect("127.0.0.1","root","","anvdko_oussoukro") or die("Problème de connection dans bdd");
+$bdd = mysqli_connect("localhost","root","","anvdko_oussoukro") or die("Problème de connection dans bdd");
 
 if (file_exists(__DIR__ . '/password_helper.php')) {
     include_once __DIR__ . '/password_helper.php';

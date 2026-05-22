@@ -534,7 +534,7 @@ $cfgNom = !empty($configuration['nom']) ? $configuration['nom'] : 'ANVDKO';
             width: 50px;
             height: 50px;
             background-color: var(--white);
-            background-image: url('../assets/img/gr_code.png');
+            background-image: url('../assets/img/qr_anvdko.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -613,7 +613,7 @@ $cfgNom = !empty($configuration['nom']) ? $configuration['nom'] : 'ANVDKO';
             
             // Générer ou récupérer l'URL du QR code
             if (empty($membre['qr_url'])) {
-                $qrUrl = "https://anvdko.rca-emergency.com/membres/voir_cotisation.php?id_membre=" . 
+                $qrUrl = "https://anvdko.site/membres/voir_cotisation.php?id_membre=" . 
                          crypt_decrypt_chaine($membre['id'], 'C');
             } else {
                 $qrUrl = $membre['qr_url'];
@@ -699,7 +699,7 @@ $cfgNom = !empty($configuration['nom']) ? $configuration['nom'] : 'ANVDKO';
             <?php foreach ($membres as $membre): ?>
                 <?php 
                 if (empty($membre['qr_url'])) {
-                    $qrUrl = "https://anvdko.rca-emergency.com/membres/voir_cotisation.php?id_membre=" . 
+                    $qrUrl = "https://anvdko.site/membres/voir_cotisation.php?id_membre=" . 
                              crypt_decrypt_chaine($membre['id'], 'C');
                 } else {
                     $qrUrl = $membre['qr_url'];

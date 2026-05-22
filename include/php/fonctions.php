@@ -1223,7 +1223,7 @@ function affyoutubeAdmin($width, $height, $lienYoutube, $class)
                     <div class='border rounded $class' style='display: inline-block; width: $width; height: $height; background-position: center; background-size: cover; background-image: url($image);'></div>
                 </a>";
     } else {
-        $image = "https://anvdko.rca-emergency.com//fichiers/images/no_image.jpg";
+        $image = "https://anvdko.site//fichiers/images/no_image.jpg";
         return "<div class='border rounded $class' style='display: inline-block; width: $width; height: $height; background-position: center; background-size: cover; background-image: url($image);'></div>";
     }
 }
@@ -1295,11 +1295,11 @@ function affImgAdmin($width, $height, $image, $class)
       
     if(!empty($image))
     {
-        $image = 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$image; 
+        $image = 'https://anvdko.site//fichiers/uploads/'.$image; 
     }
     else
     {
-        $image = 'https://anvdko.rca-emergency.com//fichiers/images/no_image.jpg'; 
+        $image = 'https://anvdko.site//fichiers/images/no_image.jpg'; 
     }
 
     return "<div class='border rounded ".$class."' style='display: inline-block; width: ".$width."; height: ".$height."; background-position: center; background-size: cover; background-image: url(".$image.");'></div>"; 
@@ -1307,7 +1307,7 @@ function affImgAdmin($width, $height, $image, $class)
 
 function getUrlFichier($fichier)
 {
-    $url_fichier = 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$fichier;
+    $url_fichier = 'https://anvdko.site//fichiers/uploads/'.$fichier;
 
     if(strlen(@file_get_contents($url_fichier)) > 0) 
     {
@@ -1323,7 +1323,7 @@ function getUrlUtilisateur($image)
     if (empty($image)) {
         return '../assets/img/LOGO.jpg';
     }
-    $url_image = 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$image;
+    $url_image = 'https://anvdko.site//fichiers/uploads/'.$image;
 
     if(strlen(@file_get_contents($url_image)) > 0) 
     {
@@ -1340,7 +1340,7 @@ function setSrcImg($lienImage)
 {
     if(!empty($lienImage))
     {
-        return 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$lienImage; 
+        return 'https://anvdko.site//fichiers/uploads/'.$lienImage; 
     } 
     else
     {
@@ -1352,7 +1352,7 @@ function AffImagSite($lienImage)
 {
     if(!empty($lienImage))
     {
-        return 'https://anvdko.rca-emergency.com//fichiers/uploads/'.$lienImage; 
+        return 'https://anvdko.site//fichiers/uploads/'.$lienImage; 
     } 
     else
     {

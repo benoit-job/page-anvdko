@@ -24,7 +24,7 @@ if (mysqli_num_rows($resultat) > 0) {
         $qrUrl = $existingQrUrl;
     } else {
         // Sinon, générer un nouvel URL de QR code
-        $qrUrl = "https://anvdko.rca-emergency.com/membres/voir_cotisation.php?id_membre=" . crypt_decrypt_chaine($membre['id'], 'C');
+        $qrUrl = "https://anvdko.site/membres/voir_cotisation.php?id_membre=" . crypt_decrypt_chaine($membre['id'], 'C');
         
         $updateQuery = "UPDATE membres SET qr_url = '$qrUrl' WHERE id = ".$membre['id'];
         $updateResult = mysqli_query($bdd, $updateQuery) or die("Requête non conforme");
@@ -480,7 +480,7 @@ if ($image === 'no_image.jpg') {
       width: 50px;
       height: 50px;
       background-color: var(--white);
-      background-image: url('../assets/img/gr_code.png');
+      background-image: url('../assets/img/qr_anvdko.png');
       background-size: contain; /* ou 'contain' */
       background-repeat: no-repeat;
       background-position: center;

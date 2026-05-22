@@ -569,7 +569,7 @@
     // Génération du QR Code
     new QRious({
       element: document.getElementById('qrCode'),
-      value: 'https://anvdko.rca-emergency.com/membre/ANVDKO-2023-0542',
+      value: 'https://anvdko.site/membre/ANVDKO-2023-0542',
       size: 70,
       background: '#ffffff',
       foreground: '#2c2664'
@@ -578,7 +578,7 @@
     // Génération du QR Code au verso
     new QRious({
       element: document.querySelector('.qr1'),
-      value: 'https://anvdko.rca-emergency.com',
+      value: 'https://anvdko.site',
       size: 70,
       background: '#ffffff',
       foreground: '#2c2664'
