@@ -41,7 +41,7 @@ if ($configLogo === 'no_image.jpg') {
 
 $cfgTel = trim(($configuration['contact1'] ?? '') . (($configuration['contact2'] ?? '') !== '' ? ' / ' . ($configuration['contact2'] ?? '') : ''));
 if ($cfgTel === '') {
-    $cfgTel = '+225 07 08 09 10 11 / 01 02 03 04 05';
+    $cfgTel = '+225 0 171 166 820/ 0 709 503 220';
 }
 $cfgEmail = !empty($configuration['email']) ? $configuration['email'] : 'anvdkocontact@gmail.com';
 $cfgNom = !empty($configuration['nom']) ? $configuration['nom'] : 'ANVDKO';

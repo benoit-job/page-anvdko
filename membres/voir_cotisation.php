@@ -17,6 +17,8 @@ $resultat = mysqli_query($bdd, $query) or die("Requête non conforme784521");
 $_SESSION['membre'] = mysqli_fetch_array($resultat);
 }
 
+requireAdhesionPayee();
+
 
 
 $query = "SELECT *

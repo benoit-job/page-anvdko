@@ -2,6 +2,7 @@
 include("includes/php/connexion_acces_page.php");
 include("../include/php/connexion_bdd.php");
 include("../include/php/fonctions.php"); 
+requireAdhesionPayee();
 ?>
 
 <!DOCTYPE html>

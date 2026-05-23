@@ -629,9 +629,9 @@ if ($image === 'no_image.jpg') {
 
       <div class="footer1">
         <div class="contacts1">
-          <div><span>Tél :</span> +225 07 08 09 10 11 / 01 02 03 04 05</div>
+          <div><span>Tél :</span> +225 0 171 166 820/ 0 709 503 220</div>
           <div><span>Email :</span> anvdkocontact@gmail.com</div>
-          <div><span>Site web :</span> anvdko.com</div>
+          <div><span>Site web :</span> anvdko.site</div>
         </div>
         <div class="qr1"></div>
       </div>

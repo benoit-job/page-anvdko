@@ -12,6 +12,8 @@ if (!empty($_GET["id_membre"])) {
     $_SESSION['membre'] = ($result && mysqli_num_rows($result) > 0 ? mysqli_fetch_assoc($result) : []);
 }
 
+requireAdhesionPayee();
+
 // Gestion de l'année
 $_SESSION["annee_exceptionnelle"] = !empty($_GET['annee_exceptionnelle']) 
     ? intval($_GET["annee_exceptionnelle"]) 

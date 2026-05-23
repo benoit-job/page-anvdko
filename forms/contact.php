@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Configuration
 define('RECEIVING_EMAIL', 'kouebenoit@gmail.com');
 define('SITE_NAME', 'ANVDKO');
-define('ADMIN_EMAIL', 'noreply@anvdko.com'); // Email d'envoi
+define('ADMIN_EMAIL', 'noreply@anvdko.site'); // Email d'envoi
 
 // Log des erreurs dans un fichier
 function logError($message) {

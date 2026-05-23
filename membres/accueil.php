@@ -74,6 +74,7 @@ $query ="SELECT *, CONCAT(UPPER(nom), ' ', UPPER(prenom)) AS nom_prenom
  FROM membres WHERE id = ".$_SESSION['membre']['id'];
 $resultat = mysqli_query($bdd, $query) or die("Requête non conforme");
 $_SESSION["membres"] = mysqli_fetch_array($resultat);
+$adhesionPayee = isAdhesionPayee();
 
 $logo = isset($_SESSION["membres"]["logo"]) && !empty($_SESSION["membres"]["logo"]) 
     ? $_SESSION["membres"]["logo"] 
@@ -360,7 +361,7 @@ body {
                             <h4 class="fw-bolder mb-2"><?php echo $_SESSION["membres"]["nom_prenom"]; ?></h4>
                             <!-- <a href="badge1.php" class="btn btn-sm rounded mt-2">Voir mon badge</a> -->
                             <!-- <a href="voir_badge.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]["id"], 'C'); ?>" class="btn btn-sm rounded mt-2">Voir mon badge</a> -->
-                            <a href="badge.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]["id"], 'C'); ?>" class="btn btn-sm rounded mt-2">Mon badge</a>
+                            <a href="badge.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]["id"], 'C'); ?>" class="btn btn-sm rounded mt-2 needs-adhesion-link" data-adhesion-url="badge.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]["id"], 'C'); ?>">Mon badge</a>
                         </div>
                         </div>
                     </div>
@@ -520,7 +521,8 @@ body {
                             <!-- Première carte - Mensuelles -->
                             <div class="col-6 col-sm-4 col-md-3">
                                 <a href="voir_cotisation.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]['id'], 'C')?>" 
-                                class="ratio ratio-1x1 d-block text-decoration-none border-0 rounded shadow-sm hover-scale"
+                                class="ratio ratio-1x1 d-block text-decoration-none border-0 rounded shadow-sm hover-scale needs-adhesion-link"
+                                data-adhesion-url="voir_cotisation.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]['id'], 'C')?>"
                                 style="background: linear-gradient(135deg, #f6c23e 0%, #f8d568 100%);">
                                     <div class="d-flex flex-column justify-content-center align-items-center h-100 p-2">
                                         <i class="fas fa-coins fa-3x mb-2" style="color: #2c3e50;"></i>
@@ -534,7 +536,8 @@ body {
                             <!-- Deuxième carte - Exceptionnelles -->
                             <div class="col-6 col-sm-4 col-md-3">
                                 <a href="recap_pay_exeptionnels.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]['id'], 'C')?>" 
-                                class="ratio ratio-1x1 d-block text-decoration-none border-0 rounded shadow-sm hover-scale"
+                                class="ratio ratio-1x1 d-block text-decoration-none border-0 rounded shadow-sm hover-scale needs-adhesion-link"
+                                data-adhesion-url="recap_pay_exeptionnels.php?id_membre=<?php echo crypt_decrypt_chaine($_SESSION["membres"]['id'], 'C')?>"
                                 style="background: linear-gradient(135deg, #e74a3b 0%, #eb675a 100%);">
                                     <div class="d-flex flex-column justify-content-center align-items-center h-100 p-2">
                                         <i class="fas fa-coins fa-3x mb-2" style="color: white;"></i>
@@ -672,30 +675,29 @@ body {
     });
 </script>
 
-
 <script>
-// function verifierStatut(statut, id_membre) {
-//     if (statut !== "Payé") {
-//         Swal.fire({
-//             title: "Paiement requis",
-//             text: "Vous devez payer votre adhésion pour accéder à votre badge.",
-//             icon: "warning",
-//             showCancelButton: true,
-//             confirmButtonText: "Payer maintenant",
-//             cancelButtonText: "Quitter",
-//             reverseButtons: true,
-//             customClass: {
-//                 confirmButton: 'btn btn-success me-2',
-//                 cancelButton: 'btn btn-secondary'
-//             },
-//             buttonsStyling: false
-//         }).then((result) => {
-//             if (result.isConfirmed) {
-//                 window.location.assign("tel:+2252724584789");
-//             }
-//         });
-//     } else {
-//         window.location.href = "voir_badge.php?id_membre=" + id_membre;
-//     }
-// }
+    var adhesionPayee = <?php echo json_encode($adhesionPayee ? true : false); ?>;
+    var adhesionMessage = "Vous devez payer votre adhésion avant d'accéder à cette page.";
+
+    function showAdhesionAlert() {
+        Swal.fire({
+            title: "Paiement requis",
+            text: adhesionMessage,
+            icon: "warning",
+            confirmButtonText: "Compris",
+            customClass: {
+                confirmButton: 'btn btn-primary'
+            },
+            buttonsStyling: false
+        });
+    }
+
+    document.querySelectorAll('.needs-adhesion-link').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            if (!adhesionPayee) {
+                event.preventDefault();
+                showAdhesionAlert();
+            }
+        });
+    });
 </script>
