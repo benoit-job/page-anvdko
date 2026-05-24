@@ -18,12 +18,12 @@
     <!-- ===============================================-->
     <!--    Favicons-->
     <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="../fichiers/logos/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="../fichiers/logos/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="../fichiers/logos/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="../fichiers/logos/favicon.ico">
-    <link rel="manifest" href="assets/img/favicons/manifest.json">
-    <meta name="msapplication-TileImage" content="../fichiers/logos/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/anvdko/fichiers/logos/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/anvdko/fichiers/logos/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/anvdko/fichiers/logos/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/anvdko/fichiers/logos/favicon.ico">
+    <link rel="manifest" href="/anvdko/assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="/anvdko/fichiers/logos/favicon.ico">
     <meta name="theme-color" content="#ffffff">
     <script src="vendors/simplebar/simplebar.min.js"></script>
     <script src="assets/js/config.js"></script>
@@ -66,7 +66,7 @@
         content: '';
         position: fixed;
         inset: 0;
-        background: url('../assets/img/LOGO.jpg') center 42% no-repeat;
+        background: url('/anvdko/assets/img/LOGO.jpg') center 42% no-repeat;
         background-size: min(480px, 85vw) auto;
         opacity: 0.07;
         pointer-events: none;

@@ -53,12 +53,12 @@ if (isset($_POST['changer_mdp'])) {
     <!-- ===============================================-->
     <!--    Favicons-->
     <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/LOGO.jpg">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/img/LOGO.jpg">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/img/LOGO.jpg">
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/LOGO.jpg">
-    <link rel="manifest" href="../assets/img/favicons/manifest.json">
-    <meta name="msapplication-TileImage" content="../assets/img/LOGO.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/anvdko/assets/img/LOGO.jpg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/anvdko/assets/img/LOGO.jpg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/anvdko/assets/img/LOGO.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="/anvdko/assets/img/LOGO.jpg">
+    <link rel="manifest" href="/anvdko/assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="/anvdko/assets/img/LOGO.jpg">
     <meta name="theme-color" content="#ffffff">
     <script src="../anvdko/assets/vendors/simplebar/simplebar.min.js"></script>
     <script src="../anvdko/assets/js/config.js"></script>

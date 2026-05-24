@@ -70,8 +70,8 @@ function badge_class_projet($statut)
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-  <link href="assets/img/LOGO.jpg" rel="icon">
-  <link href="assets/img/LOGO.jpg" rel="apple-touch-icon">
+  <link href="/anvdko/assets/img/LOGO.jpg" rel="icon">
+  <link href="/anvdko/assets/img/LOGO.jpg" rel="apple-touch-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
@@ -90,7 +90,7 @@ function badge_class_projet($statut)
     h1 { font-weight: 700; position: relative; display: inline-block; }
     h1::after { content: ""; position: absolute; bottom: -10px; left: 0; width: 100%; height: 3px; background: var(--accent-color); transform: scaleX(0.8); }
     .logo-header { background: linear-gradient(135deg, var(--dark-color), var(--primary-color)); color: white; padding: 80px 0 60px; text-align: center; margin-bottom: 40px; position: relative; overflow: hidden; border-bottom: 5px solid var(--accent-color); }
-    .logo-header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('assets/img/LOGO.jpg') no-repeat center center; background-size: contain; opacity: 0.1; z-index: 0; }
+    .logo-header::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('/anvdko/assets/img/LOGO.jpg') no-repeat center center; background-size: contain; opacity: 0.1; z-index: 0; }
     .logo-container { position: relative; z-index: 2; margin-bottom: 30px; }
     .logo-img { width: 180px; height: 180px; object-fit: contain; border-radius: 50%; border: 5px solid var(--accent-color); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); transition: all 0.5s ease; background-color: white; padding: 15px; }
     .logo-img:hover { transform: scale(1.05) rotate(5deg); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); }

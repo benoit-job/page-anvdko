@@ -1321,42 +1321,46 @@ function getUrlFichier($fichier)
 function getUrlUtilisateur($image)
 {
     if (empty($image)) {
-        return '../assets/img/LOGO.jpg';
+        return '/anvdko/assets/img/LOGO.jpg';
     }
-    $url_image = 'https://anvdko.site//fichiers/uploads/'.$image;
-
-    if(strlen(@file_get_contents($url_image)) > 0) 
-    {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        $url_image = '/anvdko/fichiers/uploads/'.$image;
         return $url_image;
-    } 
-    else 
-    {
-        return '../assets/img/LOGO.jpg';
+    }
+
+    $url_image = 'https://anvdko.site/fichiers/uploads/'.$image;
+    if (@file_get_contents($url_image) !== false) {
+        return $url_image;
+    } else {
+        return '/anvdko/assets/img/LOGO.jpg';
     }
 }
 
 
 function setSrcImg($lienImage)
 {
-    if(!empty($lienImage))
-    {
-        return 'https://anvdko.site//fichiers/uploads/'.$lienImage; 
-    } 
-    else
-    {
-        return '../assets/img/LOGO.jpg';
+    if (!empty($lienImage)) {
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+            return '/anvdko/fichiers/uploads/' . $lienImage;
+        }
+        return 'https://anvdko.site/fichiers/uploads/' . $lienImage;
+    } else {
+        return '/anvdko/assets/img/LOGO.jpg';
     }
 }
 
 function AffImagSite($lienImage)
 {
-    if(!empty($lienImage))
-    {
-        return 'https://anvdko.site//fichiers/uploads/'.$lienImage; 
-    } 
-    else
-    {
-        return '../assets/img/LOGO.jpg';
+    if (!empty($lienImage)) {
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+            return '/anvdko/fichiers/uploads/' . $lienImage;
+        }
+        return 'https://anvdko.site/fichiers/uploads/' . $lienImage;
+    } else {
+        return '/anvdko/assets/img/LOGO.jpg';
     }
 }
 function safe_safe_ucfirst($value) {

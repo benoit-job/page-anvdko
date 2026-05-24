@@ -2,7 +2,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo setSrcImg($_SESSION["configuration"]["logo"]);?>">
     <link rel="icon" type="image/png" sizes="16x16" href="<?php echo setSrcImg($_SESSION["configuration"]["logo"]);?>">
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo setSrcImg($_SESSION["configuration"]["logo"]);?>">
-    <link rel="manifest" href="assets/img/favicons/manifest.json">
+    <link rel="manifest" href="/anvdko/assets/img/favicons/manifest.json">
     <meta name="msapplication-TileImage" content="<?php echo setSrcImg($_SESSION["configuration"]["logo"]);?>">
     <meta name="theme-color" content="#ffffff">
     <script src="vendors/simplebar/simplebar.min.js"></script>

@@ -8,8 +8,8 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="assets/img/LOGO.jpg" rel="icon">
-  <link href="assets/img/LOGO.jpg" rel="apple-touch-icon">
+  <link href="/anvdko/assets/img/LOGO.jpg" rel="icon">
+  <link href="/anvdko/assets/img/LOGO.jpg" rel="apple-touch-icon">
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Font Awesome pour les icônes -->
