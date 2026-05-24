@@ -70,8 +70,9 @@ function badge_class_projet($statut)
   <meta content="" name="description">
   <meta content="" name="keywords">
 
-  <link href="/anvdko/assets/img/LOGO.jpg" rel="icon">
-  <link href="/anvdko/assets/img/LOGO.jpg" rel="apple-touch-icon">
+  <?php $base = (isset($_SERVER['HTTP_HOST']) && (strpos($_SERVER['HTTP_HOST'],'localhost')!==false || strpos($_SERVER['HTTP_HOST'],'127.0.0.1')!==false)) ? '/anvdko' : ''; ?>
+  <link href="<?php echo $base;?>/assets/img/LOGO.jpg" rel="icon">
+  <link href="<?php echo $base;?>/assets/img/LOGO.jpg" rel="apple-touch-icon">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />

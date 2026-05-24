@@ -1320,47 +1320,53 @@ function getUrlFichier($fichier)
 }
 function getUrlUtilisateur($image)
 {
-    if (empty($image)) {
-        return '/anvdko/assets/img/LOGO.jpg';
-    }
     $host = $_SERVER['HTTP_HOST'] ?? '';
-    if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
-        $url_image = '/anvdko/fichiers/uploads/'.$image;
-        return $url_image;
+    $isLocal = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
+
+    if (empty($image)) {
+        return $isLocal ? '/anvdko/assets/img/LOGO.jpg' : 'https://' . $host . '/assets/img/LOGO.jpg';
     }
 
-    $url_image = 'https://anvdko.site/fichiers/uploads/'.$image;
+    if ($isLocal) {
+        return '/anvdko/fichiers/uploads/' . $image;
+    }
+
+    $url_image = 'https://' . $host . '/fichiers/uploads/' . $image;
     if (@file_get_contents($url_image) !== false) {
         return $url_image;
     } else {
-        return '/anvdko/assets/img/LOGO.jpg';
+        return 'https://' . $host . '/assets/img/LOGO.jpg';
     }
 }
 
 
 function setSrcImg($lienImage)
 {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $isLocal = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
+
     if (!empty($lienImage)) {
-        $host = $_SERVER['HTTP_HOST'] ?? '';
-        if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        if ($isLocal) {
             return '/anvdko/fichiers/uploads/' . $lienImage;
         }
-        return 'https://anvdko.site/fichiers/uploads/' . $lienImage;
+        return 'https://' . $host . '/fichiers/uploads/' . $lienImage;
     } else {
-        return '/anvdko/assets/img/LOGO.jpg';
+        return $isLocal ? '/anvdko/assets/img/LOGO.jpg' : 'https://' . $host . '/assets/img/LOGO.jpg';
     }
 }
 
 function AffImagSite($lienImage)
 {
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $isLocal = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
+
     if (!empty($lienImage)) {
-        $host = $_SERVER['HTTP_HOST'] ?? '';
-        if (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        if ($isLocal) {
             return '/anvdko/fichiers/uploads/' . $lienImage;
         }
-        return 'https://anvdko.site/fichiers/uploads/' . $lienImage;
+        return 'https://' . $host . '/fichiers/uploads/' . $lienImage;
     } else {
-        return '/anvdko/assets/img/LOGO.jpg';
+        return $isLocal ? '/anvdko/assets/img/LOGO.jpg' : 'https://' . $host . '/assets/img/LOGO.jpg';
     }
 }
 function safe_safe_ucfirst($value) {

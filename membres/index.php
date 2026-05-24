@@ -10,8 +10,9 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="/anvdko/assets/img/LOGO.jpg" rel="icon">
-  <link href="/anvdko/assets/img/LOGO.jpg" rel="apple-touch-icon">
+  <?php $base = (isset($_SERVER['HTTP_HOST']) && (strpos($_SERVER['HTTP_HOST'],'localhost')!==false || strpos($_SERVER['HTTP_HOST'],'127.0.0.1')!==false)) ? '/anvdko' : ''; ?>
+  <link href="<?php echo $base;?>/assets/img/LOGO.jpg" rel="icon">
+  <link href="<?php echo $base;?>/assets/img/LOGO.jpg" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">

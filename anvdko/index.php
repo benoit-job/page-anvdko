@@ -18,12 +18,13 @@
     <!-- ===============================================-->
     <!--    Favicons-->
     <!-- ===============================================-->
-    <link rel="apple-touch-icon" sizes="180x180" href="/anvdko/fichiers/logos/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="/anvdko/fichiers/logos/favicon.ico">
-    <link rel="icon" type="image/png" sizes="16x16" href="/anvdko/fichiers/logos/favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="/anvdko/fichiers/logos/favicon.ico">
-    <link rel="manifest" href="/anvdko/assets/img/favicons/manifest.json">
-    <meta name="msapplication-TileImage" content="/anvdko/fichiers/logos/favicon.ico">
+    <?php $base = (isset($_SERVER['HTTP_HOST']) && (strpos($_SERVER['HTTP_HOST'],'localhost')!==false || strpos($_SERVER['HTTP_HOST'],'127.0.0.1')!==false)) ? '/anvdko' : ''; ?>
+    <link rel="apple-touch-icon" sizes="180x180" href="<?php echo $base;?>/fichiers/logos/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="<?php echo $base;?>/fichiers/logos/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="<?php echo $base;?>/fichiers/logos/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $base;?>/fichiers/logos/favicon.ico">
+    <link rel="manifest" href="<?php echo $base;?>/assets/img/favicons/manifest.json">
+    <meta name="msapplication-TileImage" content="<?php echo $base;?>/fichiers/logos/favicon.ico">
     <meta name="theme-color" content="#ffffff">
     <script src="vendors/simplebar/simplebar.min.js"></script>
     <script src="assets/js/config.js"></script>
