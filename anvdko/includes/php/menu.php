@@ -90,6 +90,17 @@
   </div>
 </li>
 
+<li class="nav-item">
+  <div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="gestion_site.php">
+      <div class="d-flex align-items-center">
+        <span class="nav-link-icon"><span data-feather="globe"></span></span>
+        <span class="nav-link-text-wrapper"><span class="nav-link-text">Gestion site public</span></span>
+      </div>
+    </a>
+  </div>
+</li>
+
 <?php elseif ($secretaire === "Non"): ?>
 
 <!-- Accueil -->
@@ -169,6 +180,17 @@
       <div class="d-flex align-items-center">
         <span class="nav-link-icon"><span data-feather="layers"></span></span>
         <span class="nav-link-text-wrapper"><span class="nav-link-text">Gestion page Projets</span></span>
+      </div>
+    </a>
+  </div>
+</li>
+
+<li class="nav-item">
+  <div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="gestion_site.php">
+      <div class="d-flex align-items-center">
+        <span class="nav-link-icon"><span data-feather="globe"></span></span>
+        <span class="nav-link-text-wrapper"><span class="nav-link-text">Gestion site public</span></span>
       </div>
     </a>
   </div>
@@ -273,6 +295,11 @@
     <div class="parent-wrapper label-1">
       <ul class="nav collapse parent" id="agentReception">
         <li class="nav-item">
+          <a class="nav-link" href="adhesion.php">
+            <div class="d-flex align-items-center"><span class="nav-link-text">Adhésions</span></div>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="pay_mensuels.php">
             <div class="d-flex align-items-center"><span class="nav-link-text">Paiements mensuels</span></div>
           </a>
@@ -314,6 +341,16 @@
       <div class="d-flex align-items-center">
         <span class="nav-link-icon"><span data-feather="layers"></span></span>
         <span class="nav-link-text-wrapper"><span class="nav-link-text">Gestion page Projets</span></span>
+      </div>
+    </a>
+  </div>
+</li>
+<li class="nav-item">
+  <div class="nav-item-wrapper">
+    <a class="nav-link label-1" href="gestion_site.php">
+      <div class="d-flex align-items-center">
+        <span class="nav-link-icon"><span data-feather="globe"></span></span>
+        <span class="nav-link-text-wrapper"><span class="nav-link-text">Gestion site public</span></span>
       </div>
     </a>
   </div>

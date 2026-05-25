@@ -1,7 +1,8 @@
 <?php
 include("includes/php/connexion_acces_page.php");
 include("../include/php/connexion_bdd.php");
-include("../include/php/fonctions.php"); 
+include("../include/php/fonctions.php");
+include("../include/php/site_public.php");
 ?>
 
 <?php
@@ -51,6 +52,17 @@ if (isset($_POST["actualiserInfosevent"])) {
     $date_fin = strip_tags(htmlspecialchars(trim($_POST["date_fin"])));
     $places_max = strip_tags(htmlspecialchars(trim($_POST["places_max"])));
     $description = strip_tags(htmlspecialchars(trim($_POST["description"])));
+    $contact_telephone = strip_tags(htmlspecialchars(trim($_POST["contact_telephone"] ?? '')));
+    $afficher_alerte = isset($_POST['afficher_alerte_site']) ? 1 : 0;
+
+    $set_tel = '';
+    if (anvdko_site_column_exists($bdd, 'evenements', 'contact_telephone')) {
+        $set_tel = ", contact_telephone = \"" . mysqli_real_escape_string($bdd, $contact_telephone) . "\"";
+    }
+    $set_alerte = '';
+    if (anvdko_site_column_exists($bdd, 'evenements', 'afficher_alerte_site')) {
+        $set_alerte = ", afficher_alerte_site = $afficher_alerte";
+    }
 
         $query = "UPDATE evenements
                   SET titre = \"$titre\",
@@ -58,8 +70,9 @@ if (isset($_POST["actualiserInfosevent"])) {
                       date_debut = \"$date_debut\",
                       date_fin = \"$date_fin\",
                       places_max = \"$places_max\",
-                      description = ".empty_to_NULL($description).",
-                      updated_at = '".date('Y-m-d H:i')."'
+                      description = ".empty_to_NULL($description)."
+                      $set_tel $set_alerte
+                      , updated_at = '".date('Y-m-d H:i')."'
                   WHERE id_configuration = " . $_SESSION['configuration']['id'] . "
                   AND id = $id_event";
         mysqli_query($bdd, $query) or die("Requête non conforme0101");
@@ -182,6 +195,22 @@ $_SESSION['event'] = mysqli_fetch_array($resultat);
                                                     <label class="form-label">Places maximum</label>                      
                                                 </div>                                         
                                             </div>
+                                            <?php if (anvdko_site_column_exists($bdd, 'evenements', 'contact_telephone')): ?>
+                                            <div class='col-md-6 mb-1'>
+                                                <div class="form-floating">
+                                                    <input type="tel" name="contact_telephone" class="form-control" value="<?php echo htmlspecialchars($_SESSION['event']['contact_telephone'] ?? ''); ?>">
+                                                    <label class="form-label">Téléphone à joindre (alerte site)</label>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                            <?php if (anvdko_site_column_exists($bdd, 'evenements', 'afficher_alerte_site')): ?>
+                                            <div class='col-md-6 mb-1 d-flex align-items-center'>
+                                                <div class="form-check mt-3">
+                                                    <input class="form-check-input" type="checkbox" name="afficher_alerte_site" id="afficher_alerte_site" <?php echo !isset($_SESSION['event']['afficher_alerte_site']) || $_SESSION['event']['afficher_alerte_site'] ? 'checked' : ''; ?>>
+                                                    <label class="form-check-label" for="afficher_alerte_site">Afficher l'alerte 🚨 sur le site public</label>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>

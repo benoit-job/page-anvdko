@@ -25,7 +25,7 @@ $id_utilisateur = $_SESSION["utilisateur"]["id"] ?? 0;
 $id_configuration = $_SESSION["configuration"]["id"] ?? 0;
 
 if (isset($_POST['paiements']) && is_array($_POST['paiements'])) {
-    $montant_mensuel = floatval($_POST['montant_mensuel'] ?? 1000);
+    $montant_mensuel = floatval($_POST['montant_mensuel'] ?? $_SESSION["configuration"]["montant_mensuel"] ?? '');
 
     foreach ($_POST['paiements'] as $mois_str => $paye) {
         $mois_payer = moisToDate($mois_str);
@@ -52,7 +52,7 @@ if (isset($_POST['paiements']) && is_array($_POST['paiements'])) {
 
 // Traitement "Tout payer"
 if (isset($_POST['tout_payer']) && $_POST['tout_payer'] === '1') {
-    $montant_mensuel = floatval($_POST['montant_mensuel'] ?? 1000);
+    $montant_mensuel = floatval($_POST['montant_mensuel'] ?? $_SESSION["configuration"]["montant_mensuel"] ?? 1000);
     $annee = date('Y');
 
     $query = "SELECT date_heure FROM membres WHERE id = '$id_membre'";

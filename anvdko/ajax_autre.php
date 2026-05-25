@@ -254,15 +254,19 @@ if (isset($_POST['liste_cartes'])) {
     $nbreCarte = (int) $_POST['nbreCarte'];
     $statut_ad = isset($_POST['statut_ad']) ? $_POST['statut_ad'] : '';
 
-    $query = "SELECT *, 
+    $query = "SELECT m.*, 
+                    COALESCE(a.statut, 'Non payé') as statut_ad_current,
                     CONCAT(CASE 
-                        WHEN genre = 'HOMME' THEN 'M' 
-                        WHEN genre = 'FEMME' THEN 'Mme' 
-                        WHEN genre = 'MADEMOISELLE' THEN 'Mlle' 
-                        ELSE genre END, '. ', nom, ' ', prenom) AS nom_prenom 
-              FROM membres 
-              WHERE statut_ad = '".mysqli_real_escape_string($bdd, $statut_ad)."' 
-              ORDER BY nom ASC 
+                        WHEN m.genre = 'HOMME' THEN 'M' 
+                        WHEN m.genre = 'FEMME' THEN 'Mme' 
+                        WHEN m.genre = 'MADEMOISELLE' THEN 'Mlle' 
+                        ELSE m.genre END, '. ', m.nom, ' ', m.prenom) AS nom_prenom 
+              FROM membres m
+              LEFT JOIN adhesion a ON m.id = a.id_membre AND a.id_adhesion = (
+                SELECT MAX(id_adhesion) FROM adhesion WHERE id_membre = m.id
+              )
+              WHERE COALESCE(a.statut, 'Non payé') = '".mysqli_real_escape_string($bdd, $statut_ad)."' 
+              ORDER BY m.nom ASC 
               LIMIT $nbreCarte, 20";
 
     $resultat = mysqli_query($bdd, $query) or die("Requête non conforme");
@@ -329,14 +333,30 @@ if (isset($_POST['liste_dons'])) {
 
 
 if(isset($_POST['actualiserStatutAdhesion'])) {
-    $id_adhesion_statut = strip_tags(htmlspecialchars(trim(crypt_decrypt_chaine($_POST['id_adhesion_statut'], 'D'))));
+    $id_membre_statut = strip_tags(htmlspecialchars(trim(crypt_decrypt_chaine($_POST['id_adhesion_statut'], 'D'))));
     $statut_adhesion = strip_tags(htmlspecialchars(trim($_POST["statut_adhesion"]))); 
+    $montant_adhesion = $_SESSION["configuration"]["montant_adhesion"] ?? 1000;
+    $id_utilisateur = $_SESSION["utilisateur"]["id"] ?? 0;
+    $date_now = date("Y-m-d H:i:s");
 
-       $query = "UPDATE membres 
-                  SET statut_ad = \"$statut_adhesion\",  
-                      date_statut_ad = '".date('Y-m-d H:i')."' 
-                  WHERE id='".$id_adhesion_statut."'"; 
-        mysqli_query($bdd, $query) or die("Requête non conforme");
+    // Vérifier si une adhésion existe déjà
+    $check_query = "SELECT id_adhesion FROM adhesion WHERE id_membre = '".$id_membre_statut."' ORDER BY date_heure DESC LIMIT 1";
+    $check_result = mysqli_query($bdd, $check_query);
+
+    if (mysqli_num_rows($check_result) > 0) {
+        // Mettre à jour l'adhésion existante
+        $query = "UPDATE adhesion 
+                  SET statut = \"$statut_adhesion\",  
+                      date_heure = '$date_now' 
+                  WHERE id_membre = '".$id_membre_statut."'
+                  ORDER BY date_heure DESC LIMIT 1"; 
+    } else {
+        // Créer une nouvelle adhésion
+        $query = "INSERT INTO adhesion (id_membre, id_utilisateur, montant, statut, date_heure)
+                  VALUES ('".$id_membre_statut."', $id_utilisateur, $montant_adhesion, \"$statut_adhesion\", '$date_now')";
+    }
+    
+    mysqli_query($bdd, $query) or die("Requête non conforme");
 
     echo $statut_adhesion;
 }

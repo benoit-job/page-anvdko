@@ -2,6 +2,9 @@
 include("includes/php/connexion_acces_page.php");
 include("../include/php/connexion_bdd.php");
 include("../include/php/fonctions.php");
+include("../include/php/admin_image_upload.php");
+
+$admin_img_error = '';
 
 function table_exists_projets($bdd, $table)
 {
@@ -27,26 +30,25 @@ if ($tables_ok && isset($_POST['save_textes'])) {
 }
 
 if ($tables_ok && isset($_POST['ajouter_projet'])) {
-    $titre = strip_tags(trim($_POST['titre'] ?? ''));
-    $description = strip_tags(trim($_POST['description'] ?? ''));
-    $image_url = strip_tags(trim($_POST['image_url'] ?? ''));
-    $lien_url = strip_tags(trim($_POST['lien_url'] ?? '#'));
-    $statut_badge = strip_tags(trim($_POST['statut_badge'] ?? 'En cours'));
+    $image_url = anvdko_admin_image_sql($bdd, 'image_projet', 'image_courante', true);
+    if ($image_url !== null) {
+    $titre = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['titre'] ?? '')));
+    $description = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['description'] ?? '')));
+    $lien_url = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['lien_url'] ?? '#')));
+    $statut_badge = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['statut_badge'] ?? 'En cours')));
     $ordre = (int) ($_POST['ordre'] ?? 0);
-    $titre = mysqli_real_escape_string($bdd, $titre);
-    $description = mysqli_real_escape_string($bdd, $description);
-    $image_url = mysqli_real_escape_string($bdd, $image_url);
-    $lien_url = mysqli_real_escape_string($bdd, $lien_url);
-    $statut_badge = mysqli_real_escape_string($bdd, $statut_badge);
     mysqli_query($bdd, "INSERT INTO projets_public (titre, description, image_url, lien_url, statut_badge, ordre, actif) VALUES ('$titre', '$description', '$image_url', '$lien_url', '$statut_badge', $ordre, 1)");
     reload_current_page();
+    } else {
+        $admin_img_error = 'Veuillez sélectionner une image pour le projet.';
+    }
 }
 
 if ($tables_ok && isset($_POST['modifier_projet'])) {
     $id = (int) crypt_decrypt_chaine($_POST['id_projet'] ?? '', 'D');
     $titre = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['titre'] ?? '')));
     $description = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['description'] ?? '')));
-    $image_url = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['image_url'] ?? '')));
+    $image_url = anvdko_admin_image_sql($bdd, 'image_projet', 'image_courante', false) ?: '';
     $lien_url = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['lien_url'] ?? '#')));
     $statut_badge = mysqli_real_escape_string($bdd, strip_tags(trim($_POST['statut_badge'] ?? 'En cours')));
     $ordre = (int) ($_POST['ordre'] ?? 0);
@@ -119,6 +121,9 @@ if ($tables_ok && table_exists_projets($bdd, 'projets_temoignages')) {
             <?php if (!$tables_ok): ?>
                 <div class="alert alert-warning">Table <strong>projets_public</strong> introuvable. Importez le fichier SQL puis rechargez la page.</div>
             <?php else: ?>
+            <?php if (!empty($admin_img_error)): ?>
+                <div class="alert alert-danger"><?php echo htmlspecialchars($admin_img_error); ?></div>
+            <?php endif; ?>
 
             <ul class="nav nav-tabs mb-4" role="tablist">
                 <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-textes" type="button">Textes &amp; CTA</button></li>
@@ -150,11 +155,11 @@ if ($tables_ok && table_exists_projets($bdd, 'projets_temoignages')) {
                     <div class="card mb-4">
                         <div class="card-header">Ajouter un projet</div>
                         <div class="card-body">
-                            <form method="post" class="row g-2">
-                                <div class="col-md-4"><input name="titre" class="form-control" placeholder="Titre" required></div>
-                                <div class="col-md-3"><input name="image_url" class="form-control" placeholder="URL image" required></div>
+                            <form method="post" enctype="multipart/form-data" class="row g-2">
+                                <div class="col-md-6"><input name="titre" class="form-control" placeholder="Titre" required></div>
                                 <div class="col-md-3"><input name="lien_url" class="form-control" placeholder="Lien En savoir plus" value="#"></div>
-                                <div class="col-md-2"><input name="statut_badge" class="form-control" placeholder="Statut" value="En cours"></div>
+                                <div class="col-md-3"><input name="statut_badge" class="form-control" placeholder="Statut" value="En cours"></div>
+                                <div class="col-12"><?php echo anvdko_admin_image_picker_html('image_projet', '', 'image_courante', 'Image du projet', true); ?></div>
                                 <div class="col-12"><textarea name="description" class="form-control" rows="2" placeholder="Description"></textarea></div>
                                 <div class="col-md-2"><input type="number" name="ordre" class="form-control" placeholder="Ordre" value="0"></div>
                                 <div class="col-12"><button type="submit" name="ajouter_projet" class="btn btn-success btn-sm">Ajouter</button></div>
@@ -166,13 +171,13 @@ if ($tables_ok && table_exists_projets($bdd, 'projets_temoignages')) {
                             <div class="col-12">
                                 <div class="card border">
                                     <div class="card-body">
-                                        <form method="post" class="row g-2 align-items-end">
+                                        <form method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
                                             <input type="hidden" name="id_projet" value="<?php echo htmlspecialchars(crypt_decrypt_chaine((string)$p['id'], 'C')); ?>">
                                             <div class="col-md-2"><label class="form-label small">Ordre</label><input type="number" name="ordre" class="form-control form-control-sm" value="<?php echo (int)$p['ordre']; ?>"></div>
                                             <div class="col-md-4"><label class="form-label small">Titre</label><input name="titre" class="form-control form-control-sm" value="<?php echo htmlspecialchars($p['titre']); ?>"></div>
                                             <div class="col-md-3"><label class="form-label small">Statut badge</label><input name="statut_badge" class="form-control form-control-sm" value="<?php echo htmlspecialchars($p['statut_badge']); ?>"></div>
                                             <div class="col-md-3"><label class="form-label small">Actif</label><div class="form-check mt-2"><input class="form-check-input" type="checkbox" name="actif" <?php echo !empty($p['actif']) ? 'checked' : ''; ?>></div></div>
-                                            <div class="col-12"><label class="form-label small">URL image</label><input name="image_url" class="form-control form-control-sm" value="<?php echo htmlspecialchars($p['image_url']); ?>"></div>
+                                            <div class="col-12"><?php echo anvdko_admin_image_picker_html('image_projet', $p['image_url'] ?? '', 'image_courante', 'Image', false, true); ?></div>
                                             <div class="col-12"><label class="form-label small">Lien</label><input name="lien_url" class="form-control form-control-sm" value="<?php echo htmlspecialchars($p['lien_url'] ?? '#'); ?>"></div>
                                             <div class="col-12"><label class="form-label small">Description</label><textarea name="description" class="form-control form-control-sm" rows="2"><?php echo htmlspecialchars($p['description'] ?? ''); ?></textarea></div>
                                             <div class="col-12">
@@ -216,5 +221,6 @@ if ($tables_ok && table_exists_projets($bdd, 'projets_temoignages')) {
     </div>
 </main>
 <?php include('includes/php/includes-js.php');?>
+<?php echo anvdko_admin_image_picker_script(); ?>
 </body>
 </html>

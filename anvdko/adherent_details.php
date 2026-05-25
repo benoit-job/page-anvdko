@@ -84,6 +84,12 @@ $query = "SELECT *
 $resultat = mysqli_query($bdd, $query) or die("Requête non conforme");  
 $_SESSION['membre'] = mysqli_fetch_array($resultat);
 
+// Charger le statut d'adhésion depuis la table adhesion
+$query_adhesion = "SELECT statut, montant, date_heure FROM adhesion WHERE id_membre = ".$_SESSION['id_membre']." ORDER BY date_heure DESC LIMIT 1";
+$resultat_adhesion = mysqli_query($bdd, $query_adhesion);
+$adhesion_data = mysqli_fetch_assoc($resultat_adhesion);
+$_SESSION['membre']['statut_ad'] = $adhesion_data ? $adhesion_data['statut'] : 'Non payé';
+
 $signature = isset($_SESSION["membre"]["signature"]) && !empty($_SESSION["membre"]["signature"])
     ? $_SESSION["membre"]["signature"]
     : '';

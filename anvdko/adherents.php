@@ -94,7 +94,7 @@ if(isset($_POST["supprimermembre"]))
 	                        <th></th>
 	                      </tr>
 	                    </thead>
-	                    <tbody id="listeadherent"> 
+                          <tbody class="listeadherent"> 
                           <tr id="spinner">
                               <td colspan="6" class="text-center">
                                   <div class="spinner-border spinner-border-sm" role="status" aria-hidden="false">
@@ -162,7 +162,7 @@ if(isset($_POST["supprimermembre"]))
                 nbreadherent += 20;
             }
 
-            $('#listeadherent #spinner').remove(); 
+            $('.listeadherent #spinner').remove(); 
         });
     </script>
 
@@ -186,7 +186,7 @@ if(isset($_POST["supprimermembre"]))
               dataType: 'html',
               success: function (data) {
                   if (data.trim() !== '') {
-                      $('#listeadherent').append(data);  // Affiche les données dans le tableau
+                      $('.listeadherent').append(data);  // Affiche les données dans le tableau
                       resolve(true);
                   } else {
                       resolve(false);

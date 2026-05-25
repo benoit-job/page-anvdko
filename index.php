@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/include/php/connexion_bdd.php';
+require_once __DIR__ . '/include/php/site_public.php';
+$anvdko_site = anvdko_load_site_data($bdd, 1);
+$anvdko_evenements_json = json_encode($anvdko_site['evenements_alerte'], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT);
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -217,6 +223,71 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    #anvdko-event-alert {
+      position: fixed; top: 90px; left: 16px; z-index: 9999;
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: #fff; border: none; border-radius: 50px;
+      padding: 10px 18px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(220,53,69,.45);
+      animation: anvdko-pulse 2s infinite;
+    }
+    @keyframes anvdko-pulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.05); } }
+  </style>
+  <script>
+    window.anvdkoEvenements = <?php echo $anvdko_evenements_json ?: '[]'; ?>;
+    document.addEventListener('DOMContentLoaded', function() {
+      const evts = window.anvdkoEvenements || [];
+      if (!evts.length || typeof Swal === 'undefined') return;
+      const btn = document.createElement('button');
+      btn.id = 'anvdko-event-alert';
+      btn.type = 'button';
+      btn.innerHTML = '🚨 Événement' + (evts.length > 1 ? 's' : '');
+      btn.title = 'Cliquez pour voir les événements';
+      document.body.appendChild(btn);
+      function fmtDate(d) {
+        if (!d) return '—';
+        try { return new Date(d.replace(' ', 'T')).toLocaleString('fr-FR'); } catch(e) { return d; }
+      }
+      function showEvent(ev) {
+        const tel = ev.contact_telephone || '';
+        let html = '<div class="text-start" style="font-size:15px">';
+        if (ev.lieu) html += '<p><strong>Lieu :</strong> ' + ev.lieu + '</p>';
+        if (ev.date_debut) html += '<p><strong>Début :</strong> ' + fmtDate(ev.date_debut) + '</p>';
+        if (ev.date_fin) html += '<p><strong>Fin :</strong> ' + fmtDate(ev.date_fin) + '</p>';
+        if (ev.description_plain) html += '<p>' + ev.description_plain.replace(/\n/g, '<br>') + '</p>';
+        if (tel) html += '<p class="mt-3"><strong>📞 Contact :</strong> <a href="tel:' + tel.replace(/\s/g,'') + '">' + tel + '</a></p>';
+        html += '</div>';
+        Swal.fire({
+          title: ev.titre || ev.n_event || 'Événement ANVDKO',
+          html: html,
+          width: '720px',
+          confirmButtonText: 'Fermer',
+          showCloseButton: true
+        });
+      }
+      btn.addEventListener('click', function() {
+        if (evts.length === 1) {
+          showEvent(evts[0]);
+          return;
+        }
+        const opts = {};
+        evts.forEach((ev, i) => { opts[i] = (ev.titre || ev.n_event || 'Événement ' + (i+1)); });
+        Swal.fire({
+          title: '🚨 Événements à venir',
+          input: 'select',
+          inputOptions: opts,
+          inputPlaceholder: 'Choisir un événement',
+          showCancelButton: true,
+          confirmButtonText: 'Voir les détails'
+        }).then(r => {
+          if (r.isConfirmed && evts[r.value]) showEvent(evts[r.value]);
+        });
+      });
+    });
+  </script>
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {

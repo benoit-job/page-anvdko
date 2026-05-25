@@ -5,10 +5,7 @@ include("../include/php/fonctions.php");
 ?>
 
 <?php
-// Fonction pour formater les montants
-function formatMontant($montant) {
-    return number_format($montant, 0, ',', ' ') . ' F';
-}
+
 // Format correct pour les requêtes : YYYY-MM
 $currentYearMonth = date('Y-m');
 $mois1 = date('Y-m'); // Ce mois

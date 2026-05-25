@@ -13,6 +13,8 @@ if(isset($_POST['modifierConfiguration']))
     $contact2     = strip_tags(htmlspecialchars(trim($_POST["contact2"])));
     $email        = strip_tags(htmlspecialchars(trim($_POST["email"])));
     $localisation = strip_tags(htmlspecialchars(trim($_POST["localisation"])));
+    $montant_adhesion = floatval($_POST["montant_adhesion"] ?? 1000);
+    $montant_mensuel = floatval($_POST["montant_mensuel"] ?? 1000);
 
     if(isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) 
     {
@@ -38,7 +40,9 @@ if(isset($_POST['modifierConfiguration']))
                  contact1 = \"$contact1\", 
                  contact2 = \"$contact2\",
                  email = \"$email\", 
-                 localisation = \"$localisation\"
+                 localisation = \"$localisation\",
+                 montant_adhesion = $montant_adhesion,
+                 montant_mensuel = $montant_mensuel
              WHERE id = ".$_SESSION['configuration']['id'];
     mysqli_query($bdd, $query) or die("Requête non conforme"); 
 
@@ -118,6 +122,18 @@ $_SESSION["configuration"] = mysqli_fetch_array($resultat);
                                     <div class="mb-3">
                                         <label class="form-label">localisation</label>
                                         <input type="text" name="localisation" class="form-control" value="<?php echo $_SESSION["configuration"]["localisation"];?>" required/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Montant d'adhésion (FCFA)</label>
+                                        <input type="number" step="0.01" name="montant_adhesion" class="form-control" value="<?php echo $_SESSION["configuration"]["montant_adhesion"] ?? 1000;?>" required/>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Cotisation mensuelle (FCFA)</label>
+                                        <input type="number" step="0.01" name="montant_mensuel" class="form-control" value="<?php echo $_SESSION["configuration"]["montant_mensuel"] ?? 1000;?>" required/>
                                     </div>
                                 </div>
                             </div>

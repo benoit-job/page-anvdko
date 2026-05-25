@@ -5,23 +5,38 @@ if (empty($_SESSION['membre']) || ($_SESSION['membre']['statut'] ?? '') !== 'act
     exit;
 }
 
-function getAdhesionStatut() {
+function getAdhesionStatut($bdd = null) {
+    global $bdd;
     $statut = '';
-    if (!empty($_SESSION['membre']['statut_ad'])) {
-        $statut = $_SESSION['membre']['statut_ad'];
-    } elseif (!empty($_SESSION['membres']['statut_ad'])) {
-        $statut = $_SESSION['membres']['statut_ad'];
+    
+    // Essayer de récupérer le statut depuis la table adhesion
+    if (isset($_SESSION['membre']['id']) && $bdd) {
+        $query = "SELECT statut FROM adhesion WHERE id_membre = ".(int)$_SESSION['membre']['id']." ORDER BY date_heure DESC LIMIT 1";
+        $result = mysqli_query($bdd, $query);
+        if ($result && $row = mysqli_fetch_assoc($result)) {
+            $statut = $row['statut'];
+        }
     }
+    
+    // Fallback sur la session s'il n'y a rien dans la base
+    if (empty($statut)) {
+        if (!empty($_SESSION['membre']['statut_ad'])) {
+            $statut = $_SESSION['membre']['statut_ad'];
+        } elseif (!empty($_SESSION['membres']['statut_ad'])) {
+            $statut = $_SESSION['membres']['statut_ad'];
+        }
+    }
+    
     return trim(strtolower($statut));
 }
 
-function isAdhesionPayee() {
-    $statut = getAdhesionStatut();
+function isAdhesionPayee($bdd = null) {
+    $statut = getAdhesionStatut($bdd);
     return $statut === 'payé' || $statut === 'paye';
 }
 
-function requireAdhesionPayee($returnUrl = 'accueil.php') {
-    if (!isAdhesionPayee()) {
+function requireAdhesionPayee($returnUrl = 'accueil.php', $bdd = null) {
+    if (!isAdhesionPayee($bdd)) {
         $returnUrl = htmlspecialchars($returnUrl, ENT_QUOTES, 'UTF-8');
         $message = "Vous devez payer votre adhésion avant d'accéder à cette page.";
         echo '<!DOCTYPE html>';
