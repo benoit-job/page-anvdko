@@ -27,15 +27,18 @@ include("../include/php/fonctions.php");
 
       <?php include('includes/php/header.php');?>
 
-      <div class="content">
+      <div class="content" data-export-region>
 
         <div class="pb-5">
           <div class="row g-4">
             <div class="col-12">
 
-              <div class="mb-8">
-                <h2 class="mb-2">Gestion des Adhésions</h2>
-                <h5 class="text-body-tertiary fw-semibold">Visualiser et gérer les adhésions des membres</h5>
+              <div class="mb-8 d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                  <h2 class="mb-2">Gestion des Adhésions</h2>
+                  <h5 class="text-body-tertiary fw-semibold">Visualiser et gérer les adhésions des membres</h5>
+                </div>
+                <?php $page_export_title = 'Liste adhésions ANVDKO'; include('includes/php/export_buttons.php'); ?>
               </div>
 
               <div class="page-section">

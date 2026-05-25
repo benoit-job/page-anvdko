@@ -12,6 +12,7 @@
 <script src="vendors/feather-icons/feather.min.js"></script>
 <script src="vendors/dayjs/dayjs.min.js"></script>
 <script src="assets/js/phoenix.js"></script>
+<script src="assets/js/admin-export.js"></script>
 
 <script src="vendors/tinymce/tinymce.min.js"></script>  
 <script src="vendors/flatpickr/flatpickr.min.js"></script>

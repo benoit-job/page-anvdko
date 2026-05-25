@@ -1204,6 +1204,11 @@ function setEmptyVal($montant)
     }
 }
 
+function formatMontant($montant)
+{
+    return number_format(floatval($montant ?? 0), 0, ',', ' ') . ' FCFA';
+}
+
 function affyoutubeAdmin($width, $height, $lienYoutube, $class) 
 {
     $videoId = '';

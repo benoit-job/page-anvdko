@@ -300,6 +300,11 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="adhesion_recap.php">
+            <div class="d-flex align-items-center"><span class="nav-link-text">Récap. adhésions</span></div>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="pay_mensuels.php">
             <div class="d-flex align-items-center"><span class="nav-link-text">Paiements mensuels</span></div>
           </a>
