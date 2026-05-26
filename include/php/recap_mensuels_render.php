@@ -4,36 +4,77 @@ function recap_mensuels_load_data($bdd, $annee)
 {
     $annee = (int) $annee;
     $paiements = [];
-    $totaux_mois = array_fill(1, 12, ['a_payer' => 0, 'paye' => 0, 'reste' => 0]);
-    $total_global = ['a_payer' => 0, 'paye' => 0, 'reste' => 0];
+    
+    // Config
+    $config_sql = "SELECT montant_mensuel FROM configurations LIMIT 1";
+    $config_res = mysqli_query($bdd, $config_sql);
+    $config_data = mysqli_fetch_assoc($config_res);
+    $montant_mensuel_config = floatval($config_data['montant_mensuel'] ?? 2000);
 
+    // Paiements
     $sql = "SELECT p.*, 
-                   UPPER(CONCAT(m.nom, ' ', m.prenom)) AS nom_complet,
-                   m.genre,
                    MONTH(STR_TO_DATE(p.mois_payer, '%Y-%m')) AS mois
             FROM paiements p
-            JOIN membres m ON p.id_membre = m.id
-            WHERE YEAR(STR_TO_DATE(p.mois_payer, '%Y-%m')) = ?
-            ORDER BY m.nom, m.prenom, p.mois_payer";
-
+            WHERE YEAR(STR_TO_DATE(p.mois_payer, '%Y-%m')) = ?";
     $stmt = mysqli_prepare($bdd, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $annee);
     mysqli_stmt_execute($stmt);
     $res = mysqli_stmt_get_result($stmt);
-
     if ($res) {
         while ($row = mysqli_fetch_assoc($res)) {
             $paiements[$row['id_membre']][$row['mois']] = $row;
-            $totaux_mois[$row['mois']]['a_payer'] += $row['a_payer'];
-            $totaux_mois[$row['mois']]['paye'] += $row['paye'];
-            $totaux_mois[$row['mois']]['reste'] += $row['reste'];
-            $total_global['a_payer'] += $row['a_payer'];
-            $total_global['paye'] += $row['paye'];
-            $total_global['reste'] += $row['reste'];
         }
     }
 
-    return compact('paiements', 'totaux_mois', 'total_global', 'annee');
+    // Membres
+    $membres = [];
+    $q_membres = "
+        SELECT m.id, 
+            m.date_heure AS date_inscription,
+            UPPER(CONCAT(m.nom, ' ', m.prenom)) AS nom_complet, 
+            m.genre,
+            a.date_heure AS date_adhesion
+        FROM membres m
+        LEFT JOIN adhesion a ON a.id_membre = m.id
+        ORDER BY m.nom, m.prenom ASC";
+    $res_membres = mysqli_query($bdd, $q_membres);
+    while ($m = mysqli_fetch_assoc($res_membres)) {
+        $membres[$m['id']] = $m;
+    }
+
+    $totaux_mois = array_fill(1, 12, ['a_payer' => 0, 'paye' => 0, 'reste' => 0]);
+    $total_global = ['a_payer' => 0, 'paye' => 0, 'reste' => 0];
+
+    foreach ($membres as $id_membre => $m) {
+        $annee_ins = (int)date('Y', strtotime($m['date_adhesion']));
+        $mois_ins = (int)date('n', strtotime($m['date_adhesion']));
+        
+        $mois_debut = 1;
+        if ($annee == $annee_ins) {
+            $mois_debut = $mois_ins + 1;
+        }
+        
+        for ($mois = 1; $mois <= 12; $mois++) {
+            if ($mois == 4 || ($annee == $annee_ins && $mois < $mois_debut) || ($annee < $annee_ins)) {
+                continue;
+            }
+            
+            $p = $paiements[$id_membre][$mois] ?? null;
+            $a_payer = $p ? $p['a_payer'] : $montant_mensuel_config;
+            $paye = $p ? $p['paye'] : 0;
+            $reste = $p ? $p['reste'] : $a_payer;
+            
+            $totaux_mois[$mois]['a_payer'] += $a_payer;
+            $totaux_mois[$mois]['paye'] += $paye;
+            $totaux_mois[$mois]['reste'] += $reste;
+            
+            $total_global['a_payer'] += $a_payer;
+            $total_global['paye'] += $paye;
+            $total_global['reste'] += $reste;
+        }
+    }
+
+    return compact('membres', 'paiements', 'totaux_mois', 'total_global', 'annee', 'montant_mensuel_config');
 }
 
 function render_recap_mensuels_html($bdd, $annee)
@@ -80,50 +121,68 @@ function render_recap_mensuels_html($bdd, $annee)
                         <tr>
                             <th rowspan="2">Membre</th>
                             <?php for ($m = 1; $m <= 12; $m++): ?>
+                                <?php if ($m == 4) continue; ?>
                                 <th class="text-center month-header"><?= substr($noms_mois[$m], 0, 3) ?></th>
                             <?php endfor; ?>
                             <th class="text-center month-header" rowspan="2">Total</th>
                         </tr>
                         <tr>
                             <?php for ($m = 1; $m <= 12; $m++): ?>
+                                <?php if ($m == 4) continue; ?>
                                 <th class="text-center"><small><?= number_format($totaux_mois[$m]['paye'], 0, ',', ' ') ?> FCFA</small></th>
                             <?php endfor; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $query = "SELECT id, UPPER(CONCAT(nom, ' ', prenom)) AS nom_complet, genre FROM membres ORDER BY nom, prenom";
-                        $result = mysqli_query($bdd, $query);
-                        while ($membre = mysqli_fetch_assoc($result)):
+                        foreach ($membres as $id_membre => $membre):
                             $civilite = ($membre['genre'] == 'HOMME') ? 'M.' : (($membre['genre'] == 'FEMME') ? 'Mme' : 'Mlle');
+                            
+                            $annee_ins = (int)date('Y', strtotime($membre['date_adhesion']));
+                            $mois_ins = (int)date('n', strtotime($membre['date_adhesion']));
+                            $mois_debut = 1;
+                            if ($annee == $annee_ins) {
+                                $mois_debut = $mois_ins + 1;
+                            }
+                            
                             $total_membre = ['a_payer' => 0, 'paye' => 0, 'reste' => 0];
                         ?>
                         <tr>
-                            <td><?= $civilite . ' ' . htmlspecialchars($membre['nom_complet']) ?></td>
+                            <td><?=  $civilite . ' ' . html_entity_decode($membre['nom_complet'], ENT_QUOTES | ENT_HTML5, 'UTF-8') ?></td>
                             <?php for ($m = 1; $m <= 12; $m++):
-                                $p = $paiements[$membre['id']][$m] ?? null;
-                                if ($p) {
-                                    $total_membre['paye'] += $p['paye'];
-                                    $statut = ($p['reste'] <= 0) ? 'Payé' : (($p['paye'] > 0) ? 'Partiel' : 'Impayé');
-                                    $badge_class = ($p['reste'] <= 0) ? 'badge-paid' : (($p['paye'] > 0) ? 'badge-partial' : 'badge-unpaid');
-                                }
-                            ?>
-                            <td class="text-center">
-                                <?php if ($p): ?>
+                                if ($m == 4) continue;
+                                
+                                if (($annee == $annee_ins && $m < $mois_debut) || ($annee < $annee_ins)): ?>
+                                    <td class="text-center"><span class="badge bg-secondary">-</span></td>
+                                <?php else:
+                                    $p = $paiements[$membre['id']][$m] ?? null;
+                                    $a_payer = $p ? $p['a_payer'] : $montant_mensuel_config;
+                                    $paye = $p ? $p['paye'] : 0;
+                                    $reste = $p ? $p['reste'] : $a_payer;
+                                    
+                                    $total_membre['a_payer'] += $a_payer;
+                                    $total_membre['paye'] += $paye;
+                                    $total_membre['reste'] += $reste;
+                                    
+                                    $statut = ($reste <= 0) ? 'Payé' : (($paye > 0) ? 'Partiel' : 'Impayé');
+                                    $badge_class = ($reste <= 0) ? 'badge-paid' : (($paye > 0) ? 'badge-partial' : 'badge-unpaid');
+                                ?>
+                                <td class="text-center">
                                     <span class="badge <?= $badge_class ?>"><?= $statut ?></span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">-</span>
+                                </td>
                                 <?php endif; ?>
-                            </td>
                             <?php endfor; ?>
-                            <td class="text-center"><?= number_format($total_membre['paye'], 0, ',', ' ') ?> FCFA</td>
+                            <td class="text-center">
+                                <?= number_format($total_membre['paye'], 0, ',', ' ') ?> / <?= number_format($total_membre['a_payer'], 0, ',', ' ') ?> FCFA
+                            </td>
                         </tr>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </tbody>
                     <tfoot>
                         <tr>
                             <th>Total par mois</th>
                             <?php for ($m = 1; $m <= 12; $m++): ?>
+                                <?php if ($m == 4) continue; ?>
                                 <th class="text-center"><small><?= number_format($totaux_mois[$m]['paye'], 0, ',', ' ') ?> FCFA</small></th>
                             <?php endfor; ?>
                             <th class="text-center"><?= number_format($total_global['paye'], 0, ',', ' ') ?> FCFA</th>

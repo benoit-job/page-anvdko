@@ -121,7 +121,7 @@ function render_recap_exceptionnels_html($bdd, $annee, $id_motif)
                         ?>
                         <tr>
                             <td><?= $index + 1 ?></td>
-                            <td><?= $civilite . ' ' . htmlspecialchars($p['nom_complet']) ?></td>
+                            <td><?= $civilite . ' ' . html_entity_decode($p['nom_complet'], ENT_QUOTES | ENT_HTML5, 'UTF-8') ?></td>
                             <td class="text-end"><?= number_format($p['a_payer'], 0, ',', ' ') ?> FCFA</td>
                             <td class="text-end"><?= number_format($p['paye'], 0, ',', ' ') ?> FCFA</td>
                             <td class="text-end"><?= number_format($reste, 0, ',', ' ') ?> FCFA</td>

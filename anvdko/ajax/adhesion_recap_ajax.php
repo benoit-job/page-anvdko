@@ -40,7 +40,7 @@ if ($res && mysqli_num_rows($res) > 0) {
             : '<span class="badge bg-warning text-dark">' . htmlspecialchars($row['statut']) . '</span>';
         $rowsHtml .= '<tr>
             <td>' . htmlspecialchars($row['num_adhesion']) . '</td>
-            <td>' . htmlspecialchars($row['nom_complet']) . '</td>
+            <td>' . html_entity_decode($row['nom_complet'], ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</td>
             <td class="text-end">' . number_format((float) $row['montant'], 0, ',', ' ') . ' FCFA</td>
             <td class="text-center">' . $badge . '</td>
             <td>' . date('d/m/Y H:i', strtotime($row['date_heure'])) . '</td>
