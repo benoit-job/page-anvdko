@@ -70,11 +70,11 @@ function ProgressBarPeriodeGlobale($bdd, $id_membre, $moisDebut, $moisFin, $id_m
     $sql_montant = "SELECT montant_standard, montant_homme, montant_femme, montant_mademoiselle, montant_bureau FROM config_cotisations_exceptionnelles WHERE id = '".intval($id_motif)."'";
     $res_montant = mysqli_query($bdd, $sql_montant);
     $montant_data = $res_montant ? mysqli_fetch_assoc($res_montant) : null;
-    $montant_standard = $montant_data && !is_null($montant_data['montant_standard']) ? floatval($montant_data['montant_standard']) : null;
-    $montant_homme = $montant_data && !is_null($montant_data['montant_homme']) ? floatval($montant_data['montant_homme']) : null;
-    $montant_femme = $montant_data && !is_null($montant_data['montant_femme']) ? floatval($montant_data['montant_femme']) : null;
-    $montant_mademoiselle = $montant_data && !is_null($montant_data['montant_mademoiselle']) ? floatval($montant_data['montant_mademoiselle']) : null;
-    $montant_bureau = $montant_data && !is_null($montant_data['montant_bureau']) ? floatval($montant_data['montant_bureau']) : null;
+    $montant_standard = $montant_data && !is_null($montant_data['montant_standard']) ? round(floatval($montant_data['montant_standard'])) : null;
+    $montant_homme = $montant_data && !is_null($montant_data['montant_homme']) ? round(floatval($montant_data['montant_homme'])) : null;
+    $montant_femme = $montant_data && !is_null($montant_data['montant_femme']) ? round(floatval($montant_data['montant_femme'])) : null;
+    $montant_mademoiselle = $montant_data && !is_null($montant_data['montant_mademoiselle']) ? round(floatval($montant_data['montant_mademoiselle'])) : null;
+    $montant_bureau = $montant_data && !is_null($montant_data['montant_bureau']) ? round(floatval($montant_data['montant_bureau'])) : null;
 
     // Déterminer le montant à utiliser selon la priorité :
     // 1. Si membre du bureau ET montant_bureau défini → montant_bureau
@@ -163,6 +163,15 @@ if (isset($_SESSION['motif_exceptionnel']) && in_array($_SESSION['motif_exceptio
     $_SESSION['motif_exceptionnel'] = $last_motif;
 }
 
+// Récupérer les détails complets du motif sélectionné pour les passer au JS d'édition
+$motif_details_json = "{}";
+if ($last_motif) {
+    $sqlDetails = "SELECT * FROM config_cotisations_exceptionnelles WHERE motif = '".mysqli_real_escape_string($bdd, $last_motif)."' LIMIT 1";
+    $resDetails = mysqli_query($bdd, $sqlDetails);
+    if ($details = mysqli_fetch_assoc($resDetails)) {
+        $motif_details_json = json_encode($details);
+    }
+}
 ?>
 
 
@@ -283,8 +292,16 @@ if (isset($_SESSION['motif_exceptionnel']) && in_array($_SESSION['motif_exceptio
                                         <button type="button"
                                                 class="btn btn-phoenix-primary flex-shrink-0"
                                                 onclick="showCreateExceptionnel()">
-                                            <i class="fas fa-plus"></i> Générer une cotisation
+                                            <i class="fas fa-plus"></i> Créer
                                         </button>
+
+                                        <?php if ($last_motif): ?>
+                                        <button type="button"
+                                                class="btn btn-phoenix-warning flex-shrink-0"
+                                                onclick="editExceptionnel()">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </button>
+                                        <?php endif; ?>
 
                                         <!-- Recherche -->
                                         <div class="input-group flex-shrink-0" style="max-width: 200px;">
@@ -426,11 +443,12 @@ function showCreateExceptionnel() {
             <div class="mb-3">
                 <label class="form-label fw-bold">Motif</label>
                 <input type="text" id="motif" class="form-control" placeholder="Ex: Décès, Mariage..." required>
+                <small class="text-muted d-block mt-1">L'ajout d'un motif existant le mettra à jour automatiquement.</small>
             </div>
             
             <div class="mb-3">
                 <label class="form-label fw-bold">Montant standard <span class="text-danger">*</span></label>
-                <input type="number" id="montant_standard" class="form-control" placeholder="Montant pour tous les membres" step="0.01" min="0">
+                <input type="number" id="montant_standard" class="form-control" placeholder="Montant pour tous les membres" step="0" min="0">
                 <small class="text-muted">Ce montant sera appliqué à tous les membres par défaut</small>
             </div>
             
@@ -449,19 +467,19 @@ function showCreateExceptionnel() {
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Montant Homme</label>
-                        <input type="number" id="montant_homme" class="form-control" placeholder="Montant pour les hommes" step="0.01" min="0">
+                        <input type="number" id="montant_homme" class="form-control" placeholder="Montant pour les hommes" step="0" min="0">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Montant Femme</label>
-                        <input type="number" id="montant_femme" class="form-control" placeholder="Montant pour les femmes" step="0.01" min="0">
+                        <input type="number" id="montant_femme" class="form-control" placeholder="Montant pour les femmes" step="0" min="0">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Montant Mademoiselle</label>
-                        <input type="number" id="montant_mademoiselle" class="form-control" placeholder="Montant pour les mademoiselles" step="0.01" min="0">
+                        <input type="number" id="montant_mademoiselle" class="form-control" placeholder="Montant pour les mademoiselles" step="0" min="0">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Montant Membre du bureau</label>
-                        <input type="number" id="montant_bureau" class="form-control" placeholder="Montant pour membres du bureau" step="0.01" min="0">
+                        <input type="number" id="montant_bureau" class="form-control" placeholder="Montant pour membres du bureau" step="0" min="0">
                     </div>
                 </div>
             </div>
@@ -572,6 +590,40 @@ function showCreateExceptionnel() {
         }
     });
 }
+
+function editExceptionnel() {
+    const details = <?= $motif_details_json ?>;
+    if (!details || !details.motif) {
+        Swal.fire('Erreur', 'Aucun détail trouvé pour ce motif', 'error');
+        return;
+    }
+    
+    showCreateExceptionnel();
+    
+    // Attendre que le modal soit affiché pour remplir les champs
+    setTimeout(() => {
+        document.getElementById('motif').value = details.motif;
+        document.getElementById('motif').setAttribute('readonly', true); // Empêcher le changement de nom
+        
+        if (details.montant_standard !== null) document.getElementById('montant_standard').value = Math.round(details.montant_standard);
+        
+        const hasDiff = details.montant_homme !== null || details.montant_femme !== null || 
+                        details.montant_mademoiselle !== null || details.montant_bureau !== null;
+                        
+        if (hasDiff) {
+            document.getElementById('montants_differencies').checked = true;
+            window.toggleMontantsOptionnels();
+            
+            if (details.montant_homme !== null) document.getElementById('montant_homme').value = Math.round(details.montant_homme);
+            if (details.montant_femme !== null) document.getElementById('montant_femme').value = Math.round(details.montant_femme);
+            if (details.montant_mademoiselle !== null) document.getElementById('montant_mademoiselle').value = Math.round(details.montant_mademoiselle);
+            if (details.montant_bureau !== null) document.getElementById('montant_bureau').value = Math.round(details.montant_bureau);
+        }
+        
+        document.getElementById('mois_debut').value = details.mois_debut;
+        document.getElementById('mois_fin').value = details.mois_fin;
+    }, 100);
+}
 </script>
 
 
@@ -598,10 +650,13 @@ function showCreateExceptionnel() {
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Montant à payer</label>
                         <input type="number" id="montantAPayer" class="form-control" value="${data.montant_a_payer}" disabled>
-                        ${data.is_membre_bureau && data.montant_bureau !== null ? '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant bureau appliqué</small>' : ''}
-                        ${data.genre === 'HOMME' && data.montant_homme !== null ? '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant homme appliqué</small>' : ''}
-                        ${data.genre === 'FEMME' && data.montant_femme !== null ? '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant femme appliqué</small>' : ''}
-                        ${data.genre === 'MADEMOISELLE' && data.montant_mademoiselle !== null ? '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant mademoiselle appliqué</small>' : ''}
+                        ${(() => {
+                            if (data.is_membre_bureau && data.montant_bureau !== null) return '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant bureau appliqué</small>';
+                            if (data.genre === 'HOMME' && data.montant_homme !== null) return '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant homme appliqué</small>';
+                            if (data.genre === 'FEMME' && data.montant_femme !== null) return '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant femme appliqué</small>';
+                            if (data.genre === 'MADEMOISELLE' && data.montant_mademoiselle !== null) return '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant mademoiselle appliqué</small>';
+                            return '<small class="text-muted d-block"><i class="fas fa-info-circle"></i> Montant standard appliqué</small>';
+                        })()}
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Date de paiement</label>

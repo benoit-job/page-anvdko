@@ -99,7 +99,7 @@ $_SESSION['membre'] = mysqli_fetch_array($resultat);
 <?php
 $annee_courante = date("Y");
 
-$query_date = "SELECT date_heure FROM membres WHERE id = '".$_SESSION["membre"]["id"]."'";
+$query_date = "SELECT date_heure FROM adhesion WHERE id_membre = '".$_SESSION["membre"]["id"]."'";
 $result_date = mysqli_query($bdd, $query_date) or die(mysqli_error($bdd));
 $row_membre = mysqli_fetch_assoc($result_date);
 
@@ -128,7 +128,7 @@ if ($annee_inscription == $annee_courante) {
     $annee_depart = $annee_courante;
 }
 
-$montant_par_mois = 1000;
+$montant_par_mois = floatval($_SESSION["configuration"]["montant_mensuel"] ?? 2000);
 
 $mois_noms = [
     'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
@@ -151,6 +151,7 @@ $total_reste = 0;
 
 // Boucle des mois restants de l’année en cours (ou année suivante si besoin)
 for ($mois = $mois_depart; $mois <= 12; $mois++) {
+    if ($mois == 4) continue; // Ignorer le mois d'avril (neutre)
     $mois_format = $annee_depart . '-' . str_pad($mois, 2, '0', STR_PAD_LEFT); // ex: 2025-07
     $nom_mois = safe_safe_ucfirst($mois_noms[$mois - 1]);
 
@@ -305,7 +306,7 @@ function TousPayer(button) {
 
     $.post('paiement_ajax.php', {
         tout_payer: 1,
-        montant_mensuel: 1000 // mi-franc
+        montant_mensuel: <?= $montant_par_mois ?>
     }, function(res) {
         if (res.success) {
             afficherToast("Tous les mois ont été payés !", 'top-right', 'success', 3000);

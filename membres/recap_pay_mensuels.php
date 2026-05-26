@@ -52,17 +52,45 @@ if (isset($_SESSION["membre_id"]) && !empty($_SESSION["membre_id"])) {
 mysqli_stmt_execute($stmt);
 $res = mysqli_stmt_get_result($stmt);
 
+$config_sql = "SELECT montant_mensuel FROM configurations LIMIT 1";
+$config_res = mysqli_query($bdd, $config_sql);
+$config_data = mysqli_fetch_assoc($config_res);
+$montant_mensuel_config = floatval($config_data['montant_mensuel'] ?? 2000);
+
 if ($res) {
     while ($row = mysqli_fetch_assoc($res)) {
         $paiements[$row['id_membre']][$row['mois']] = $row;
-        
-        $totaux_mois[$row['mois']]['a_payer'] += $row['a_payer'];
-        $totaux_mois[$row['mois']]['paye'] += $row['paye'];
-        $totaux_mois[$row['mois']]['reste'] += $row['reste'];
-        
-        $total_global['a_payer'] += $row['a_payer'];
-        $total_global['paye'] += $row['paye'];
-        $total_global['reste'] += $row['reste'];
+    }
+}
+
+// Calculer les totaux de manière dynamique selon les mois exigibles (sans avril et à partir du mois d'inscription + 1 si c'est l'année d'inscription)
+$membre_id_recap = $_SESSION["membre_id"] ?? 0;
+if ($membre_id_recap > 0) {
+    $q_ins = "SELECT date_heure FROM adhesion WHERE id_membre = $membre_id_recap";
+    $res_ins = mysqli_query($bdd, $q_ins);
+    if ($row_ins = mysqli_fetch_assoc($res_ins)) {
+        $annee_ins = (int)date('Y', strtotime($row_ins['date_heure']));
+        $mois_debut_recap = 1;
+        if ($annee == $annee_ins) {
+            $mois_debut_recap = (int)date('n', strtotime($row_ins['date_heure'])) + 1;
+        }
+
+        for ($m = 1; $m <= 12; $m++) {
+            if ($m == 4 || $m < $mois_debut_recap) continue; // Ignorer avril et les mois avant l'inscription
+
+            $paiement = $paiements[$membre_id_recap][$m] ?? null;
+            $a_payer = $paiement['a_payer'] ?? $montant_mensuel_config;
+            $paye = $paiement['paye'] ?? 0;
+            $reste = $paiement['reste'] ?? $a_payer;
+
+            $totaux_mois[$m]['a_payer'] += $a_payer;
+            $totaux_mois[$m]['paye'] += $paye;
+            $totaux_mois[$m]['reste'] += $reste;
+            
+            $total_global['a_payer'] += $a_payer;
+            $total_global['paye'] += $paye;
+            $total_global['reste'] += $reste;
+        }
     }
 }
 
@@ -270,10 +298,10 @@ $noms_mois = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                         <tbody>
                             <?php if (isset($_SESSION["membre_id"])): ?>
                                 <?php foreach ($noms_mois as $num_mois => $nom_mois): ?>
-                                    <?php if ($num_mois > 0): ?>
+                                    <?php if ($num_mois > 0 && $num_mois != 4 && $num_mois >= $mois_debut_recap): ?>
                                         <?php 
                                         $paiement = $paiements[$_SESSION["membre_id"]][$num_mois] ?? null;
-                                        $a_payer = $paiement['a_payer'] ?? 0;
+                                        $a_payer = $paiement['a_payer'] ?? $montant_mensuel_config;
                                         $paye = $paiement['paye'] ?? 0;
                                         $reste = $paiement['reste'] ?? $a_payer;
                                         ?>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (is_string($value) && (trim($value) === '' || strtolower(trim($value)) === 'null'))) {
             return 'NULL';
         }
-        $floatVal = floatval($value);
+        $floatVal = round(floatval($value));
         // Accepter 0 et les valeurs positives
         return ($floatVal >= 0) ? $floatVal : 'NULL';
     }
@@ -57,7 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             '$mois_debut', 
             '$mois_fin', 
             NOW()
-        )";
+        ) ON DUPLICATE KEY UPDATE 
+            montant_standard = VALUES(montant_standard),
+            montant_homme = VALUES(montant_homme),
+            montant_femme = VALUES(montant_femme),
+            montant_mademoiselle = VALUES(montant_mademoiselle),
+            montant_bureau = VALUES(montant_bureau),
+            mois_debut = VALUES(mois_debut),
+            mois_fin = VALUES(mois_fin)";
 
     // Exécution
     if (mysqli_query($bdd, $query)) {

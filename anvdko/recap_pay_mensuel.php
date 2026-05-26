@@ -13,6 +13,11 @@ if (isset($_GET['annee'])) {
     reload_current_page();
 }
 
+$config_sql = "SELECT montant_mensuel FROM configurations LIMIT 1";
+$config_res = mysqli_query($bdd, $config_sql);
+$config_data = mysqli_fetch_assoc($config_res);
+$montant_mensuel_config = floatval($config_data['montant_mensuel'] ?? 2000);
+
 // Récupérer tous les paiements pour cette année
 $paiements = [];
 $sql = "SELECT p.*, 
@@ -30,19 +35,53 @@ if($res) {
     }
 }
 
-// Calculer les totaux globaux
+// Récupérer tous les membres
+$membres = [];
+$q_membres = "
+    SELECT m.id, 
+        m.date_heure AS date_inscription,
+        UPPER(CONCAT(m.nom, ' ', m.prenom)) AS nom_complet, 
+        m.genre,
+        a.date_heure AS date_adhesion
+    FROM membres m
+    LEFT JOIN adhesion a ON a.id_membre = m.id
+    ORDER BY m.nom, m.prenom ASC";
+$res_membres = mysqli_query($bdd, $q_membres);
+while ($m = mysqli_fetch_assoc($res_membres)) {
+    $membres[$m['id']] = $m;
+}
+
+// Calculer les totaux globaux dynamiques (en prenant en compte les impayés et en ignorant avril et mois avant inscription)
 $totaux_mois = array_fill(1, 12, ['a_payer' => 0, 'paye' => 0, 'reste' => 0]);
 $total_global = ['a_payer' => 0, 'paye' => 0, 'reste' => 0];
 
-foreach($paiements as $id_membre => $p_mois) {
-    foreach($p_mois as $mois => $p) {
-        $totaux_mois[$mois]['a_payer'] += $p['a_payer'];
-        $totaux_mois[$mois]['paye'] += $p['paye'];
-        $totaux_mois[$mois]['reste'] += $p['reste'];
+foreach ($membres as $id_membre => $m) {
+    $annee_ins = (int)date('Y', strtotime($m['date_adhesion']));
+    $mois_ins = (int)date('n', strtotime($m['date_adhesion']));
+    
+    $mois_debut = 1;
+    if ($_SESSION["annee"] == $annee_ins) {
+        $mois_debut = $mois_ins + 1;
+    }
+    
+    for ($mois = 1; $mois <= 12; $mois++) {
+        // Ignorer avril et mois avant adhésion
+        if ($mois == 4 || ($_SESSION["annee"] == $annee_ins && $mois < $mois_debut) || ($_SESSION["annee"] < $annee_ins)) {
+            continue;
+        }
         
-        $total_global['a_payer'] += $p['a_payer'];
-        $total_global['paye'] += $p['paye'];
-        $total_global['reste'] += $p['reste'];
+        $p = $paiements[$id_membre][$mois] ?? null;
+        $a_payer = $p ? $p['a_payer'] : $montant_mensuel_config;
+        $paye = $p ? $p['paye'] : 0;
+        $reste = $p ? $p['reste'] : $a_payer;
+        
+        $totaux_mois[$mois]['a_payer'] += $a_payer;
+        $totaux_mois[$mois]['paye'] += $paye;
+        $totaux_mois[$mois]['reste'] += $reste;
+        
+        $total_global['a_payer'] += $a_payer;
+        $total_global['paye'] += $paye;
+        $total_global['reste'] += $reste;
     }
 }
 
@@ -105,6 +144,36 @@ $noms_mois = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
         .badge-unpaid {
             background-color: #dc3545;
         }
+        
+        /* Styles spécifiques pour l'impression */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #section-imprimable, #section-imprimable * {
+                visibility: visible;
+            }
+            #section-imprimable {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .card-header {
+                display: none !important;
+            }
+            /* Conserver les couleurs d'arrière-plan pour l'impression */
+            .badge {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -118,7 +187,16 @@ $noms_mois = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h3 class="mb-2">Récapitulatif des paiements mensuels</h3>
-                            <h5 class="text-body-tertiary fw-semibold">Année <?= $_SESSION["annee"] ?></h5>
+                            <div class="d-flex align-items-center">
+                                <form method="GET" class="d-flex align-items-center">
+                                    <label class="me-2 fw-semibold text-body-tertiary">Année :</label>
+                                    <select name="annee" class="form-select form-select-sm" onchange="this.form.submit()" style="width: 100px;">
+                                        <?php for($y = 2024; $y <= date('Y') + 1; $y++): ?>
+                                            <option value="<?= $y ?>" <?= $_SESSION['annee'] == $y ? 'selected' : '' ?>><?= $y ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </form>
+                            </div>
                         </div>
                         <a href="pay_mensuels.php" class="btn btn-phoenix-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Retour
@@ -159,7 +237,7 @@ $noms_mois = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                     </div>
                 </div>
 
-                <div class="page-section">
+                <div class="page-section" id="section-imprimable">
                     <div class="card card-fluid">
                         <div class="card-header p-2 border-0">
                             <div class="d-flex justify-content-between align-items-center">
@@ -194,57 +272,63 @@ $noms_mois = ["", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
                                 </thead>
                                 <tbody>
                                     <?php 
-                                    // Récupérer tous les membres
-                                    $query = "SELECT id, UPPER(CONCAT(nom, ' ', prenom)) AS nom_complet, genre FROM membres ORDER BY nom, prenom";
-                                    $result = mysqli_query($bdd, $query);
-                                    
-                                    while($membre = mysqli_fetch_assoc($result)): 
+                                    foreach($membres as $id_membre => $membre): 
                                         $civilite = ($membre['genre'] == 'HOMME') ? 'M.' : 
                                                   (($membre['genre'] == 'FEMME') ? 'Mme' : 'Mlle');
                                         $total_membre = ['a_payer' => 0, 'paye' => 0, 'reste' => 0];
+                                        
+                                        $annee_ins = (int)date('Y', strtotime($membre['date_adhesion']));
+                                        $mois_ins = (int)date('n', strtotime($membre['date_adhesion']));
+                                        $mois_debut = 1;
+                                        if ($_SESSION["annee"] == $annee_ins) {
+                                            $mois_debut = $mois_ins + 1;
+                                        }
                                     ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($membre['nom_complet']) ?></td>
+                                            <td><?= html_entity_decode($membre['nom_complet'], ENT_QUOTES | ENT_HTML5, 'UTF-8') ?></td>
                                             <?php for($m = 1; $m <= 12; $m++): 
-                                                $p = $paiements[$membre['id']][$m] ?? null;
+                                                // Vérifier si le mois est ignoré (avril, avant adhésion, année précédente)
+                                                if ($m == 4 || ($_SESSION["annee"] == $annee_ins && $m < $mois_debut) || ($_SESSION["annee"] < $annee_ins)) {
+                                                    echo '<td class="text-center"><span class="badge bg-secondary">-</span></td>';
+                                                    continue;
+                                                }
                                                 
-                                                if($p) {
-                                                    $total_membre['a_payer'] += $p['a_payer'];
-                                                    $total_membre['paye'] += $p['paye'];
-                                                    $total_membre['reste'] += $p['reste'];
-                                                    
-                                                    $statut = '';
-                                                    $badge_class = '';
-                                                    
-                                                    if($p['reste'] <= 0) {
-                                                        $statut = 'Payé';
-                                                        $badge_class = 'badge-paid';
-                                                    } elseif($p['paye'] > 0) {
-                                                        $statut = 'Partiel';
-                                                        $badge_class = 'badge-partial';
-                                                    } else {
-                                                        $statut = 'Impayé';
-                                                        $badge_class = 'badge-unpaid';
-                                                    }
+                                                $p = $paiements[$membre['id']][$m] ?? null;
+                                                $a_payer = $p ? $p['a_payer'] : $montant_mensuel_config;
+                                                $paye = $p ? $p['paye'] : 0;
+                                                $reste = $p ? $p['reste'] : $a_payer;
+                                                
+                                                $total_membre['a_payer'] += $a_payer;
+                                                $total_membre['paye'] += $paye;
+                                                $total_membre['reste'] += $reste;
+                                                
+                                                $statut = '';
+                                                $badge_class = '';
+                                                
+                                                if($reste <= 0 && $a_payer > 0) {
+                                                    $statut = 'Payé';
+                                                    $badge_class = 'badge-paid';
+                                                } elseif($paye > 0) {
+                                                    $statut = 'Partiel';
+                                                    $badge_class = 'badge-partial';
+                                                } else {
+                                                    $statut = 'Impayé';
+                                                    $badge_class = 'badge-unpaid';
                                                 }
                                             ?>
                                                 <td class="text-center">
-                                                    <?php if($p): ?>
-                                                        <span class="badge <?= $badge_class ?>" 
-                                                              data-bs-toggle="tooltip" 
-                                                              title="<?= number_format($p['paye'], 0, ',', ' ') ?>FCFA / <?= number_format($p['a_payer'], 2, ',', ' ') ?>FCFA">
-                                                            <?= $statut ?>
-                                                        </span>
-                                                    <?php else: ?>
-                                                        <span class="badge bg-secondary">-</span>
-                                                    <?php endif; ?>
+                                                    <span class="badge <?= $badge_class ?>" 
+                                                          data-bs-toggle="tooltip" 
+                                                          title="<?= number_format($paye, 0, ',', ' ') ?>FCFA / <?= number_format($a_payer, 0, ',', ' ') ?>FCFA">
+                                                        <?= $statut ?>
+                                                    </span>
                                                 </td>
                                             <?php endfor; ?>
-                                            <td class="text-center">
-                                                <?= number_format($total_membre['paye'], 0, ',', ' ') ?>FCFA
+                                            <td class="text-center fw-bold">
+                                                <?= number_format($total_membre['paye'], 0, ',', ' ') ?>FCFA / <?= number_format($total_membre['a_payer'], 0, ',', ' ') ?>FCFA
                                             </td>
                                         </tr>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr>

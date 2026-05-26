@@ -3,8 +3,26 @@ include("includes/php/connexion_acces_page.php");
 include("../include/php/connexion_bdd.php");
 include("../include/php/fonctions.php"); 
 
-function ProgressBarFacturePay($bdd, $id_membre, $moisAnnee)
+function ProgressBarFacturePay($bdd, $id_membre, $moisAnnee, $date_inscription = null)
 {
+    $mois_num = (int)date('n', strtotime($moisAnnee . '-01'));
+    $annee_mois = (int)date('Y', strtotime($moisAnnee . '-01'));
+
+    // 1. Le mois d'avril est neutre
+    if ($mois_num == 4) {
+        return "<div style='width: 70px; height: 25px; background-color: #e9ecef; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 11px; color: #6c757d; margin: 0 1px;' data-bs-toggle='tooltip' title='Mois neutre (Avril)'>N/A</div>";
+    }
+
+    // 2. Vérifier si le mois est avant l'adhésion
+    if ($date_inscription) {
+        $annee_ins = (int)date('Y', strtotime($date_inscription));
+        $mois_ins = (int)date('n', strtotime($date_inscription));
+        
+        if ($annee_mois < $annee_ins || ($annee_mois == $annee_ins && $mois_num <= $mois_ins)) {
+            return "<div style='width: 70px; height: 25px; background-color: #e9ecef; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 18px; color: #adb5bd; margin: 0 1px;' data-bs-toggle='tooltip' title='Avant adhésion'>-</div>";
+        }
+    }
+
     $sql = " SELECT a_payer, paye, reste 
         FROM paiements 
         WHERE id_membre = '$id_membre' AND mois_payer = '$moisAnnee' 
@@ -13,8 +31,26 @@ function ProgressBarFacturePay($bdd, $id_membre, $moisAnnee)
     $res = mysqli_query($bdd, $sql) or die("Erreur SQL");
     $paiement = mysqli_fetch_assoc($res);
 
+    $url = "paiements_membre.php?id_membre=" . crypt_decrypt_chaine($id_membre, 'C');
+    $baseStyle = "height:25px; width:70px; margin:0 1px;";
+    $tooltip = "data-bs-toggle='tooltip' data-bs-placement='top' title='Paiement du mois $moisAnnee'";
+
     if (!$paiement) {
-        return "<div style='width: 70px;'></div>";
+        // C'est un mois exigible mais sans enregistrement (donc non payé)
+        $mois_actuel = date('Y-m');
+        if ($moisAnnee <= $mois_actuel) {
+            // En retard
+            return "<a href='$url' class='progress inline-block text-decoration-none aProgressBar' style='$baseStyle' $tooltip>
+                        <div class='progress-bar rounded-3 d-flex justify-content-center align-items-center bg-danger' 
+                             role='progressbar' style='width: 100%; font-size: 11px;' 
+                             aria-valuenow='100' aria-valuemin='0' aria-valuemax='100'>
+                             <span>non payé</span>
+                        </div>
+                    </a>";
+        } else {
+            // À venir
+            return "<div style='width: 70px; height: 25px; background-color: transparent; border: 1px dashed #ccc; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 10px; color: #adb5bd; margin: 0 1px;' data-bs-toggle='tooltip' title='À venir'>À venir</div>";
+        }
     }
 
     $a_payer = floatval($paiement['a_payer']);
@@ -29,7 +65,8 @@ function ProgressBarFacturePay($bdd, $id_membre, $moisAnnee)
 
     if ($paye >= $a_payer && $a_payer > 0) {
         $class = "bg-success";
-        $label = "{$pourcentage}%";
+        $label = "100%";
+        $pourcentage = 100;
     } elseif ($paye > 0 && $paye < $a_payer) {
         $class = "bg-warning text-white fw-bold";
         $label = "{$pourcentage}%";
@@ -188,18 +225,18 @@ if(isset($_POST["submitAnnee"]))
                     <td style=' text-transform: uppercase; font-size: 13px; font-weight: bold;'>
                     " . ucwords(strtolower($membre['nom_prenom'])) . "
                   </td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-01')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-02')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-03')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-04')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-05')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-06')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-07')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-08')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-09')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-10')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-11')."</td>
-                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-12')."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-01', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-02', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-03', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-04', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-05', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-06', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-07', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-08', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-09', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-10', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-11', $membre['date_heure'])."</td>
+                  <td class='p-0'>".ProgressBarFacturePay($bdd, $membre['id'], $_SESSION["annee_actuelle"].'-12', $membre['date_heure'])."</td>
                   <td></td>
               </tr>";
                 }
@@ -257,6 +294,7 @@ function getSelectedCheckboxes() {
     });
 
     var ids_membre = selectedIds.join(',');
+    var nbSelected = selectedIds.length;
 
     // Mise à jour du lien
     var lienSms = document.getElementById('btnSmsMembre');
@@ -266,7 +304,15 @@ function getSelectedCheckboxes() {
         lienSms.href = "plusieursPaiements.php?ids_membres="; // réinitialiser
     } else {
         $('#btnSmsMembre').show('fast');
-        lienSms.href = "plusieursPaiements.php?ids_membres=" + encodeURIComponent(ids_membre);
+        
+        // Texte singulier/pluriel selon le nombre de membres sélectionnés
+        if (nbSelected === 1) {
+            lienSms.href = "paiements_membre.php?id_membre=" + encodeURIComponent(selectedIds[0]);
+            lienSms.innerHTML = "<i class='fas fa-money-check-alt'></i> Effectuer un paiement";
+        } else {
+            lienSms.href = "plusieursPaiements.php?ids_membres=" + encodeURIComponent(ids_membre);
+            lienSms.innerHTML = "<i class='fas fa-money-check-alt'></i> Effectuer plusieurs paiements";
+        }
     }
 
 }

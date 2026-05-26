@@ -20,7 +20,12 @@ function moisToDate($mois_str) {
 
 $id_utilisateur = $_SESSION["utilisateur"]["id"] ?? 0;
 $id_configuration = $_SESSION["configuration"]["id"] ?? 0;
-$montant_mensuel = 1000; // Valeur par défaut
+
+// Récupérer le montant mensuel depuis la configuration en base de données
+$query_config = "SELECT montant_mensuel FROM configurations WHERE id = '$id_configuration'";
+$res_config = mysqli_query($bdd, $query_config);
+$config_data = mysqli_fetch_assoc($res_config);
+$montant_mensuel = floatval($config_data['montant_mensuel'] ?? 2000);
 
 // Validation du montant
 function validerMontant($montant) {
@@ -190,10 +195,14 @@ if ($action === 'tout_payer' && isset($_POST['ids_membres'])) {
         
         $row = mysqli_fetch_assoc($res);
         $inscription = $row['date_heure'];
-        $mois_start = (int)date('n', strtotime($inscription));
+        $mois_start = (int)date('n', strtotime($inscription)) + 1;
+        if ($mois_start > 12) {
+            $mois_start = 1;
+        }
         
         // Payer tous les mois restants de l'année
         for ($m = $mois_start; $m <= 12; $m++) {
+            if ($m == 4) continue; // Ignorer le mois d'avril (neutre)
             $mois_payer = $annee . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
             
             $sql_check = "SELECT id FROM paiements WHERE id_membre = '$id_membre' AND mois_payer = '$mois_payer'";

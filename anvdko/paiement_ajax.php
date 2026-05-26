@@ -58,9 +58,13 @@ if (isset($_POST['tout_payer']) && $_POST['tout_payer'] === '1') {
     $query = "SELECT date_heure FROM membres WHERE id = '$id_membre'";
     $res = mysqli_query($bdd, $query);
     $inscription = mysqli_fetch_assoc($res)['date_heure'];
-    $mois_start = (int)date('n', strtotime($inscription));
+    $mois_start = (int)date('n', strtotime($inscription)) + 1;
+    if ($mois_start > 12) {
+        $mois_start = 1;
+    }
 
     for ($m = $mois_start; $m <= 12; $m++) {
+        if ($m == 4) continue; // Ignorer le mois d'avril (neutre)
         $mois_payer = $annee . '-' . str_pad($m, 2, '0', STR_PAD_LEFT);
 
         $sql_check = "SELECT id FROM paiements WHERE id_membre = '$id_membre' AND mois_payer = '$mois_payer'";

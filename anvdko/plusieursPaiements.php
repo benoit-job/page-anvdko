@@ -97,7 +97,7 @@ while ($row = mysqli_fetch_assoc($resultat)) {
 	                    <tbody>
 <?php 
 $annee_courante = date("Y");
-$montant_par_mois = 1000;
+$montant_par_mois = floatval($_SESSION["configuration"]["montant_mensuel"] ?? 2000);
 $mois_noms = [
     'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
