@@ -3,13 +3,15 @@ include("includes/php/connexion_acces_page.php");
 include("../include/php/connexion_bdd.php");
 include("../include/php/fonctions.php"); 
 
+$should_reload = false;
+
 if (!empty($_GET["id_membre"])) {
     $_SESSION["membre_id"] = intval(strip_tags(htmlspecialchars(trim(crypt_decrypt_chaine($_GET["id_membre"], 'D')))));
-    reload_current_page();
 
     $id = $_SESSION["membre_id"];
     $result = mysqli_query($bdd, "SELECT * FROM membres WHERE id = $id");
     $_SESSION['membre'] = ($result && mysqli_num_rows($result) > 0 ? mysqli_fetch_assoc($result) : []);
+    $should_reload = true;
 }
 
 requireAdhesionPayee();
@@ -23,7 +25,12 @@ $_SESSION["annee_exceptionnelle"] = !empty($_GET['annee_exceptionnelle'])
 if (!empty($_GET['id_motif'])) {
     $_SESSION['id_motif'] = intval($_GET["id_motif"]);
     unset($_SESSION['motif_exceptionnel']);
+    $should_reload = true;
+}
+
+if ($should_reload) {
     reload_current_page();
+    exit;
 }
 
 $annee = intval($_SESSION['annee_exceptionnelle']);

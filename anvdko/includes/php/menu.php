@@ -43,7 +43,101 @@
     .parent-wrapper .parent {
       transition: max-height 0.3s ease;
     }
+    #navbarVerticalNav .nav-link {
+      border-radius: 10px;
+      margin: 2px 10px;
+      position: relative;
+      transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    #navbarVerticalNav .nav-link:hover {
+      background: rgba(56, 116, 255, 0.08);
+      transform: translateX(2px);
+    }
+
+    #navbarVerticalNav .nav-link.menu-link-active,
+    #navbarVerticalNav .nav-link.active {
+      background: linear-gradient(90deg, rgba(56, 116, 255, 0.16), rgba(32, 201, 151, 0.08));
+      color: #1f3a8a !important;
+      font-weight: 700;
+      box-shadow: inset 3px 0 0 #3874ff;
+    }
+
+    #navbarVerticalNav .nav-link.menu-link-active::after,
+    #navbarVerticalNav .nav-link.active::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+    }
+
+    #navbarVerticalNav .nav-link.menu-link-active .nav-link-icon span,
+    #navbarVerticalNav .nav-link.active .nav-link-icon span {
+      color: #2563eb !important;
+      transform: scale(1.08);
+    }
+
+    #navbarVerticalNav .dropdown-indicator.menu-parent-active {
+      background: rgba(15, 23, 42, 0.05);
+      color: #111827 !important;
+      font-weight: 700;
+    }
+
+    #navbarVerticalNav .dropdown-indicator.menu-parent-active .dropdown-indicator-icon {
+      transform: rotate(90deg);
+      transition: transform 0.18s ease;
+    }
   </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentPage = (window.location.pathname.split('/').pop() || 'accueil.php').toLowerCase();
+      const pageAliases = {
+        adherent_details: 'adherents.php',
+        depense_detail: 'depenses_anvdko.php',
+        recap_pay_mensuel: 'pay_mensuels_recap.php',
+        recap_global_cotisations: 'recap_global_cotisations.php',
+        recap_paiements_exceptionnels: 'recap_paiements_exceptionnels.php'
+      };
+      const normalizedCurrent = pageAliases[currentPage.replace('.php', '')] || currentPage;
+      let activeLink = null;
+
+      document.querySelectorAll('#navbarVerticalNav a.nav-link[href]').forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (!href || href.charAt(0) === '#') return;
+
+        const linkPage = href.split('?')[0].split('/').pop().toLowerCase();
+        if (linkPage === normalizedCurrent) {
+          activeLink = link;
+          link.classList.add('active', 'menu-link-active');
+          link.setAttribute('aria-current', 'page');
+        }
+      });
+
+      if (!activeLink) return;
+
+      const parentMenu = activeLink.closest('.parent');
+      if (parentMenu) {
+        parentMenu.classList.add('show');
+        const parentToggle = document.querySelector('[data-bs-toggle="collapse"][href="#' + parentMenu.id + '"], [data-bs-toggle="collapse"][data-bs-target="#' + parentMenu.id + '"]');
+        if (parentToggle) {
+          parentToggle.classList.add('menu-parent-active');
+          parentToggle.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      const activeItem = activeLink.closest('.nav-item');
+      if (activeItem) {
+        activeItem.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  </script>
 
   <div class="collapse navbar-collapse" id="navbarVerticalCollapse">
     <!-- scrollbar removed-->
@@ -322,6 +416,16 @@
         <li class="nav-item">
           <a class="nav-link" href="exceptionnels_pay_recap.php">
             <div class="d-flex align-items-center"><span class="nav-link-text">Récapitulatif exeptionnels</span></div>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-primary" href="recap_global_cotisations.php">
+            <div class="d-flex align-items-center"><span class="nav-link-text">Récap Global Cotisations</span></div>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-bold text-warning" href="recap_paiements_exceptionnels.php">
+            <div class="d-flex align-items-center"><span class="nav-link-text">Récap Global Exceptionnels</span></div>
           </a>
         </li>
       </ul>
