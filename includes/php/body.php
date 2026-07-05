@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const existingMessages = this.querySelectorAll('.alert-message');
             existingMessages.forEach(msg => msg.remove());
             try {
-                const response = await fetch('forms/test_local.php', { method: 'POST', body: formData });
+                const response = await fetch('forms/contact.php', { method: 'POST', body: formData });
                 const result = await response.json();
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `alert-message alert ${result.success ? 'alert-success' : 'alert-danger'}`;

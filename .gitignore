@@ -1,1 +1,6 @@
 include/php/connexion_bdd.php
+forms/mail_config.php
+forms/mail_config.local.php
+forms/contact_errors.log
+forms/messages_backup.txt
+vendor/
