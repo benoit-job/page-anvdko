@@ -6,7 +6,7 @@
 <script src="../anvdko/vendors/is/is.min.js"></script>
 <script src="../anvdko/vendors/fontawesome/all.min.js"></script>
 <script src="../anvdko/vendors/lodash/lodash.min.js"></script>
-<script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>
+<!--<script src="https://polyfill.io/v3/polyfill.min.js?features=window.scroll"></script>-->
 <script src="../anvdko/vendors/list.js/list.min.js"></script>
 <script src="../anvdko/vendors/feather-icons/feather.min.js"></script>
 <script src="../anvdko/vendors/dayjs/dayjs.min.js"></script>
