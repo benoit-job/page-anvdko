@@ -342,7 +342,10 @@ if (!is_array($points)) {
               </div>
             </div>
             <div class="col-lg-8 d-flex">
-              <form action="forms/contact.php" method="post" class="php-email-form shadow-sm p-4 bg-white rounded w-100" data-aos="fade-up" data-aos-delay="200">
+              <?php
+                $contact_action = (isset($base) ? $base : '') . '/forms/contact.php';
+              ?>
+              <form action="<?php echo htmlspecialchars($contact_action); ?>" method="post" class="php-email-form shadow-sm p-4 bg-white rounded w-100" data-aos="fade-up" data-aos-delay="200" data-contact-url="<?php echo htmlspecialchars($contact_action); ?>">
                 <div class="row gy-4">
                   <div class="col-md-6"><input type="text" name="name" class="form-control" placeholder="Votre nom" required></div>
                   <div class="col-md-6"><input type="email" class="form-control" name="email" placeholder="Votre email" required></div>
@@ -425,7 +428,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const existingMessages = this.querySelectorAll('.alert-message');
             existingMessages.forEach(msg => msg.remove());
             try {
-                const response = await fetch('forms/contact.php', { method: 'POST', body: formData });
+                const contactUrl = this.getAttribute('data-contact-url') || this.getAttribute('action') || 'forms/contact.php';
+                const response = await fetch(contactUrl, { method: 'POST', body: formData });
                 const result = await response.json();
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `alert-message alert ${result.success ? 'alert-success' : 'alert-danger'}`;

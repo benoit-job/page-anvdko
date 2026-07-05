@@ -3,7 +3,38 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+function anvdko_load_phpmailer_autoload(): bool
+{
+    static $loaded = null;
+    if ($loaded === true) {
+        return true;
+    }
+
+    $candidates = [
+        dirname(__DIR__, 2) . '/vendor/autoload.php',
+        dirname(__DIR__, 1) . '/../vendor/autoload.php',
+        __DIR__ . '/../../vendor/autoload.php',
+    ];
+
+    foreach ($candidates as $autoload) {
+        if (is_readable($autoload)) {
+            require_once $autoload;
+            $loaded = true;
+            return true;
+        }
+    }
+
+    $loaded = false;
+    return false;
+}
+
+function anvdko_is_production_host(): bool
+{
+    $host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+    return $host !== ''
+        && strpos($host, 'localhost') === false
+        && strpos($host, '127.0.0.1') === false;
+}
 
 function anvdko_build_contact_email_html(string $siteName, string $name, string $email, string $subject, string $message): string
 {
@@ -49,6 +80,117 @@ function anvdko_build_contact_email_text(string $siteName, string $name, string 
         . "---\nRépondre à : {$email}\n";
 }
 
+function anvdko_get_smtp_profiles(array $smtp): array
+{
+    if (!empty($smtp['profiles']) && is_array($smtp['profiles'])) {
+        return $smtp['profiles'];
+    }
+
+    $username = $smtp['username'] ?? '';
+    $password = preg_replace('/\s+/', '', (string) ($smtp['password'] ?? ''));
+    $fromEmail = $smtp['from_email'] ?? $username;
+    $fromName = $smtp['from_name'] ?? 'ANVDKO';
+
+    $profiles = [
+        [
+            'label' => 'Gmail TLS 587',
+            'host' => $smtp['host'] ?? 'smtp.gmail.com',
+            'port' => 587,
+            'secure' => 'tls',
+            'username' => $username,
+            'password' => $password,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+        ],
+        [
+            'label' => 'Gmail SSL 465',
+            'host' => $smtp['host'] ?? 'smtp.gmail.com',
+            'port' => 465,
+            'secure' => 'ssl',
+            'username' => $username,
+            'password' => $password,
+            'from_email' => $fromEmail,
+            'from_name' => $fromName,
+        ],
+    ];
+
+    if (!empty($smtp['lws']['enabled'])) {
+        $profiles[] = [
+            'label' => 'LWS SMTP',
+            'host' => $smtp['lws']['host'] ?? 'mail.anvdko.site',
+            'port' => (int) ($smtp['lws']['port'] ?? 587),
+            'secure' => $smtp['lws']['secure'] ?? 'tls',
+            'username' => $smtp['lws']['username'] ?? '',
+            'password' => preg_replace('/\s+/', '', (string) ($smtp['lws']['password'] ?? '')),
+            'from_email' => $smtp['lws']['from_email'] ?? ($smtp['lws']['username'] ?? ''),
+            'from_name' => $fromName,
+        ];
+    }
+
+    return $profiles;
+}
+
+function anvdko_try_smtp_send(array $profile, array $recipients, string $replyEmail, string $replyName, string $subject, string $htmlBody, string $textBody): array
+{
+    if (!anvdko_load_phpmailer_autoload()) {
+        return ['success' => false, 'error' => 'PHPMailer introuvable (dossier vendor/ manquant sur le serveur).'];
+    }
+
+    if (empty($profile['password']) || empty($profile['username'])) {
+        return ['success' => false, 'error' => 'Identifiants SMTP manquants.'];
+    }
+
+    $mail = new PHPMailer(true);
+
+    try {
+        $mail->CharSet = 'UTF-8';
+        $mail->isSMTP();
+        $mail->Host = $profile['host'];
+        $mail->SMTPAuth = true;
+        $mail->Username = $profile['username'];
+        $mail->Password = $profile['password'];
+        $mail->SMTPSecure = $profile['secure'];
+        $mail->Port = (int) $profile['port'];
+        $mail->Timeout = 25;
+        $mail->SMTPKeepAlive = false;
+
+        if (anvdko_is_production_host()) {
+            $mail->SMTPOptions = [
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                ],
+            ];
+        }
+
+        $mail->setFrom($profile['from_email'], $profile['from_name']);
+        $mail->addReplyTo($replyEmail, $replyName);
+
+        foreach ($recipients as $recipient) {
+            $mail->addAddress($recipient);
+        }
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $htmlBody;
+        $mail->AltBody = $textBody;
+        $mail->send();
+
+        return [
+            'success' => true,
+            'profile' => $profile['label'] ?? ($profile['host'] . ':' . $profile['port']),
+        ];
+    } catch (Exception $e) {
+        $error = !empty($mail->ErrorInfo) ? $mail->ErrorInfo : $e->getMessage();
+        return [
+            'success' => false,
+            'error' => $error,
+            'profile' => $profile['label'] ?? ($profile['host'] . ':' . $profile['port']),
+        ];
+    }
+}
+
 function anvdko_send_contact_email(array $config, string $name, string $email, string $subject, string $message): array
 {
     $siteName = $config['site_name'] ?? 'ANVDKO';
@@ -64,58 +206,24 @@ function anvdko_send_contact_email(array $config, string $name, string $email, s
     $emailHtml = anvdko_build_contact_email_html($siteName, $name, $email, $subject, $message);
     $emailText = anvdko_build_contact_email_text($siteName, $name, $email, $subject, $message);
     $smtp = $config['smtp'] ?? [];
+    $errors = [];
 
     if (!empty($smtp['enabled']) && !empty($smtp['password'])) {
-        try {
-            $mail = new PHPMailer(true);
-            $mail->CharSet = 'UTF-8';
-            $mail->isSMTP();
-            $mail->Host = $smtp['host'] ?? 'smtp.gmail.com';
-            $mail->SMTPAuth = true;
-            $mail->Username = $smtp['username'] ?? '';
-            $mail->Password = preg_replace('/\s+/', '', (string) $smtp['password']);
-            $mail->SMTPSecure = $smtp['secure'] ?? PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = (int) ($smtp['port'] ?? 587);
-            $mail->SMTPOptions = [
-                'ssl' => [
-                    'verify_peer' => true,
-                    'verify_peer_name' => true,
-                    'allow_self_signed' => false,
-                ],
-            ];
-            $mail->Timeout = 30;
-
-            $fromEmail = $smtp['from_email'] ?? $smtp['username'];
-            $fromName = $smtp['from_name'] ?? $siteName;
-            $mail->setFrom($fromEmail, $fromName);
-            $mail->addReplyTo($email, $name);
-
-            foreach ($recipients as $recipient) {
-                $mail->addAddress($recipient);
+        foreach (anvdko_get_smtp_profiles($smtp) as $profile) {
+            $attempt = anvdko_try_smtp_send($profile, $recipients, $email, $name, $emailSubject, $emailHtml, $emailText);
+            if (!empty($attempt['success'])) {
+                return [
+                    'success' => true,
+                    'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
+                    'transport' => $attempt['profile'] ?? 'smtp',
+                ];
             }
-
-            $mail->isHTML(true);
-            $mail->Subject = $emailSubject;
-            $mail->Body = $emailHtml;
-            $mail->AltBody = $emailText;
-            $mail->send();
-
-            return [
-                'success' => true,
-                'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
-            ];
-        } catch (Exception $e) {
-            $errorMessage = $e->getMessage();
-            if (isset($mail) && !empty($mail->ErrorInfo)) {
-                $errorMessage = $mail->ErrorInfo;
-            }
-
-            return [
-                'success' => false,
-                'message' => 'Erreur lors de l\'envoi du message. Veuillez réessayer plus tard.',
-                'debug' => $errorMessage,
-            ];
+            $errors[] = ($attempt['profile'] ?? 'SMTP') . ' : ' . ($attempt['error'] ?? 'échec');
         }
+    }
+
+    if (!anvdko_load_phpmailer_autoload()) {
+        $errors[] = 'vendor/autoload.php introuvable';
     }
 
     $headers = "MIME-Version: 1.0\r\n";
@@ -134,13 +242,7 @@ function anvdko_send_contact_email(array $config, string $name, string $email, s
         return [
             'success' => true,
             'message' => 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.',
-        ];
-    }
-
-    if ($sentCount > 0) {
-        return [
-            'success' => true,
-            'message' => 'Votre message a été envoyé à une partie des destinataires.',
+            'transport' => 'mail()',
         ];
     }
 
@@ -148,10 +250,12 @@ function anvdko_send_contact_email(array $config, string $name, string $email, s
     $backup = "\n\n=== Message du " . date('Y-m-d H:i:s') . " ===\n";
     $backup .= "Destinataires : " . implode(', ', $recipients) . "\n";
     $backup .= "De : {$name} ({$email})\nSujet : {$subject}\nMessage :\n{$message}\n";
+    $backup .= "Erreurs SMTP :\n" . implode("\n", $errors) . "\n";
     @file_put_contents($backupFile, $backup, FILE_APPEND);
 
     return [
         'success' => false,
-        'message' => 'Envoi impossible. Configurez SMTP dans forms/mail_config.local.php (mot de passe d\'application Gmail). Le message a été sauvegardé localement.',
+        'message' => 'Erreur lors de l\'envoi du message. Veuillez réessayer plus tard.',
+        'debug' => implode(' | ', $errors),
     ];
 }

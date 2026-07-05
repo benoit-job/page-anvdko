@@ -79,13 +79,14 @@ contact_log('Nouveau message de ' . $name . ' <' . $email . '> — ' . $subject)
 $result = anvdko_send_contact_email($config, $name, $email, $subject, $message);
 
 if ($result['success']) {
-    contact_log('Envoi réussi vers : ' . implode(', ', $config['recipients']));
+    $transport = $result['transport'] ?? 'smtp';
+    contact_log('Envoi réussi via ' . $transport . ' vers : ' . implode(', ', $config['recipients']));
     contact_response(true, $result['message']);
 }
 
 contact_log('Échec envoi : ' . ($result['debug'] ?? $result['message']));
 $extra = [];
-if (!empty($result['debug']) && (strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost') !== false)) {
+if (!empty($result['debug'])) {
     $extra['debug'] = $result['debug'];
 }
 contact_response(false, $result['message'], $extra);
