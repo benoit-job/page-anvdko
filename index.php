@@ -188,6 +188,80 @@ $anvdko_evenements_json = json_encode($anvdko_site['evenements_alerte'], JSON_UN
         }
     }
 
+    /* Boutons flottants Adhésion / Espace Membres */
+    .anvdko-floating-actions {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9998;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .anvdko-floating-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 50px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      animation: anvdko-float 3s ease-in-out infinite;
+    }
+
+    .anvdko-floating-btn i {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .anvdko-floating-btn--adhesion {
+      background: linear-gradient(135deg, #F26522 0%, #ff8c42 100%);
+      animation-delay: 0s;
+    }
+
+    .anvdko-floating-btn--membres {
+      background: linear-gradient(135deg, #3a336e 0%, #8d4eb5 100%);
+      animation-delay: 0.4s;
+    }
+
+    .anvdko-floating-btn:hover {
+      color: #fff;
+      animation: none;
+      transform: translateX(-4px) scale(1.04);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    @keyframes anvdko-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @media (max-width: 768px) {
+      .anvdko-floating-actions {
+        right: 12px;
+        gap: 10px;
+      }
+
+      .anvdko-floating-btn {
+        padding: 10px 14px;
+        font-size: 12px;
+      }
+
+      .anvdko-floating-btn span {
+        display: none;
+      }
+
+      .anvdko-floating-btn i {
+        font-size: 20px;
+      }
+    }
 
   </style>
 </head>
@@ -197,6 +271,17 @@ $anvdko_evenements_json = json_encode($anvdko_site['evenements_alerte'], JSON_UN
     <?php include('includes/php/body.php');?>
     <?php include('includes/php/footer.php');?>
     
+<div class="anvdko-floating-actions" aria-label="Accès rapide">
+  <a href="adhesion.php" class="anvdko-floating-btn anvdko-floating-btn--adhesion" title="Adhésion">
+    <i class="bi bi-person-plus-fill"></i>
+    <span>Adhésion</span>
+  </a>
+  <a href="membres/index.php" class="anvdko-floating-btn anvdko-floating-btn--membres" title="Espace Membres">
+    <i class="bi bi-people-fill"></i>
+    <span>Espace Membres</span>
+  </a>
+</div>
+
 <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->

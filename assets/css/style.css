@@ -48,13 +48,13 @@ h1 {
 
 h2 {
   color: #9334AF; /* Violet profond */
-font-family: 'ZCOOL KuaiLe', cursive;
+font-family: "Roboto", "Open Sans", sans-serif;
 /* Une inclinaison légère, style dynamique sans perdre en lisibilité */
 transform: skewX(-5deg);
 
 }
 h5 {
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-family: "Roboto", "Open Sans", sans-serif;
   transform: skewX(-10deg);
 }
 
@@ -203,7 +203,7 @@ p {
 
 /* STYLE CHINOIS PENCHÉ */
 .chinois-style {
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-family: "Roboto", "Open Sans", sans-serif;
   font-style: oblique 20deg;
   font-size: 36px;
   color: #C71F1F; /* Rouge profond, inspiré du ruban central du logo */
@@ -213,7 +213,7 @@ p {
   text-decoration: none;
 }
 .chinois {
-  font-family: 'ZCOOL KuaiLe', cursive;
+  font-family: "Roboto", "Open Sans", sans-serif;
   font-style: oblique 20deg;
   color: #C71F1F; /* Rouge profond, inspiré du ruban central du logo */
   transform: skewX(-15deg);
