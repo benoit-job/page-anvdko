@@ -81,7 +81,7 @@ $result = anvdko_send_contact_email($config, $name, $email, $subject, $message);
 if ($result['success']) {
     $transport = $result['transport'] ?? 'smtp';
     contact_log('Envoi réussi via ' . $transport . ' vers : ' . implode(', ', $config['recipients']));
-    contact_response(true, $result['message']);
+    contact_response(true, $result['message'], ['transport' => $transport]);
 }
 
 contact_log('Échec envoi : ' . ($result['debug'] ?? $result['message']));
