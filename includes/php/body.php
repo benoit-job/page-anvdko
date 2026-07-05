@@ -338,7 +338,7 @@ if (!is_array($points)) {
               </div>
               <div class="info-item d-flex align-items-start shadow-sm p-3 bg-white rounded" data-aos="fade-up" data-aos-delay="500">
                 <i class="bi bi-envelope fs-4 me-3"></i>
-                <div><h5 class="mb-1">Email</h5><p class="mb-0">contact@anvdko.org</p></div>
+                <div><h5 class="mb-1">Email</h5><p class="mb-0">mailanvdko@anvdko.site</p></div>
               </div>
             </div>
             <div class="col-lg-8 d-flex">

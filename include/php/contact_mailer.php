@@ -91,7 +91,7 @@ function anvdko_get_smtp_profiles(array $smtp): array
     $fromEmail = $smtp['from_email'] ?? $username;
     $fromName = $smtp['from_name'] ?? 'ANVDKO';
 
-    $profiles = [
+    $gmailProfiles = [
         [
             'label' => 'Gmail TLS 587',
             'host' => $smtp['host'] ?? 'smtp.gmail.com',
@@ -114,20 +114,56 @@ function anvdko_get_smtp_profiles(array $smtp): array
         ],
     ];
 
+    $lwsProfiles = [];
     if (!empty($smtp['lws']['enabled'])) {
-        $profiles[] = [
-            'label' => 'LWS SMTP',
-            'host' => $smtp['lws']['host'] ?? 'mail.anvdko.site',
-            'port' => (int) ($smtp['lws']['port'] ?? 587),
-            'secure' => $smtp['lws']['secure'] ?? 'tls',
-            'username' => $smtp['lws']['username'] ?? '',
-            'password' => preg_replace('/\s+/', '', (string) ($smtp['lws']['password'] ?? '')),
-            'from_email' => $smtp['lws']['from_email'] ?? ($smtp['lws']['username'] ?? ''),
-            'from_name' => $fromName,
+        $lwsUser = $smtp['lws']['username'] ?? '';
+        $lwsPass = (string) ($smtp['lws']['password'] ?? '');
+        $lwsFrom = $smtp['lws']['from_email'] ?? $lwsUser;
+        $lwsHost = $smtp['lws']['host'] ?? 'mail.anvdko.site';
+
+        $lwsProfiles = [
+            [
+                'label' => 'LWS TLS 587',
+                'host' => $lwsHost,
+                'port' => 587,
+                'secure' => 'tls',
+                'username' => $lwsUser,
+                'password' => $lwsPass,
+                'from_email' => $lwsFrom,
+                'from_name' => $fromName,
+            ],
+            [
+                'label' => 'LWS SSL 465',
+                'host' => $lwsHost,
+                'port' => 465,
+                'secure' => 'ssl',
+                'username' => $lwsUser,
+                'password' => $lwsPass,
+                'from_email' => $lwsFrom,
+                'from_name' => $fromName,
+            ],
+            [
+                'label' => 'LWS port 25',
+                'host' => $lwsHost,
+                'port' => 25,
+                'secure' => '',
+                'username' => $lwsUser,
+                'password' => $lwsPass,
+                'from_email' => $lwsFrom,
+                'from_name' => $fromName,
+            ],
         ];
     }
 
-    return $profiles;
+    if (anvdko_is_production_host() && !empty($lwsProfiles)) {
+        return array_merge($lwsProfiles, $gmailProfiles);
+    }
+
+    if (!empty($lwsProfiles)) {
+        return array_merge($gmailProfiles, $lwsProfiles);
+    }
+
+    return $gmailProfiles;
 }
 
 function anvdko_try_smtp_send(array $profile, array $recipients, string $replyEmail, string $replyName, string $subject, string $htmlBody, string $textBody): array
@@ -149,7 +185,12 @@ function anvdko_try_smtp_send(array $profile, array $recipients, string $replyEm
         $mail->SMTPAuth = true;
         $mail->Username = $profile['username'];
         $mail->Password = $profile['password'];
-        $mail->SMTPSecure = $profile['secure'];
+        if ($profile['secure'] === '' || $profile['secure'] === false) {
+            $mail->SMTPSecure = false;
+            $mail->SMTPAutoTLS = false;
+        } else {
+            $mail->SMTPSecure = $profile['secure'];
+        }
         $mail->Port = (int) $profile['port'];
         $mail->Timeout = 25;
         $mail->SMTPKeepAlive = false;

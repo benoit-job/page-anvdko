@@ -20,15 +20,15 @@ $mailConfig = [
         'password' => 'iuapxyrtjoakqzef',
         'from_email' => 'kouebenoit@gmail.com',
         'from_name' => 'ANVDKO - Formulaire contact',
-        // Optionnel : SMTP LWS si Gmail est bloqué par l'hébergeur
+        // SMTP LWS (prioritaire en production sur anvdko.site)
         'lws' => [
-            'enabled' => false,
+            'enabled' => true,
             'host' => 'mail.anvdko.site',
             'port' => 587,
             'secure' => 'tls',
-            'username' => 'contact@anvdko.site',
-            'password' => '',
-            'from_email' => 'contact@anvdko.site',
+            'username' => 'mailanvdko@anvdko.site',
+            'password' => 'Avodko-mail@01',
+            'from_email' => 'mailanvdko@anvdko.site',
         ],
     ],
 ];
